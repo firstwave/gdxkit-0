@@ -1,0 +1,40 @@
+package io.firstwave.gdxkit;
+
+import io.firstwave.gdxkit.mock.MockComponents;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * First version created on 3/30/14.
+ */
+public class AspectTest implements MockComponents {
+	@Test
+	public void testCheck() throws Exception {
+		EntityManager em = new EntityManager();
+		Entity e = em.createEntity();
+
+		em.componentManager.setEntityComponent(e, C1);
+		em.componentManager.setEntityComponent(e, C2);
+
+		Aspect a = Aspect.getAspectForAll(C1_TYPE, C2_TYPE);
+		assertTrue(a.check(e));
+
+		em.componentManager.removeEntityComponent(e, C2_TYPE);
+		assertFalse(a.check(e));
+
+		em.componentManager.setEntityComponent(e, C2);
+
+		a = Aspect.getAspectForOne(C3_TYPE);
+		assertFalse(a.check(e));
+
+		a = Aspect.getAspectForOne(C1_TYPE, C3_TYPE);
+		assertTrue(a.check(e));
+		a.exclude(C2_TYPE);
+		assertFalse(a.check(e));
+
+		a = Aspect.getEmpty(); // there's no point to have an empty aspect. Make this match everything, but give it a better name.W
+		assertTrue(a.check(e));
+	}
+}
