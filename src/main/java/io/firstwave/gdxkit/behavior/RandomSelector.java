@@ -15,7 +15,7 @@ public class RandomSelector extends CompositeNode {
 	}
 
 	@Override
-	public State evaluate(Entity e, Agent a) {
+	public Status evaluate(Entity e, Agent a) {
 		int i = random.nextInt(count());
 		return get(i).evaluate(e, a);
 	}

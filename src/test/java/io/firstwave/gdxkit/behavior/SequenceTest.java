@@ -25,7 +25,7 @@ public class SequenceTest implements TestBehaviors {
 	@Test
 	public void testEmpty() {
 		Sequence s = new Sequence();
-		assertEquals(Node.State.SUCCESS, s.evaluate(e, a));
+		assertEquals(Node.Status.SUCCESS, s.evaluate(e, a));
 	}
 
 	@Test
@@ -36,7 +36,7 @@ public class SequenceTest implements TestBehaviors {
 		s.add(new FailureNode());
 		s.add(new FailureNode());
 
-		assertEquals(Node.State.FAILURE, s.evaluate(e, a));
+		assertEquals(Node.Status.FAILURE, s.evaluate(e, a));
 	}
 
 	@Test
@@ -47,7 +47,7 @@ public class SequenceTest implements TestBehaviors {
 		s.add(new SuccessNode());
 		s.add(new FailureNode());
 
-		assertEquals(Node.State.FAILURE, s.evaluate(e, a));
+		assertEquals(Node.Status.FAILURE, s.evaluate(e, a));
 	}
 
 	@Test
@@ -57,22 +57,22 @@ public class SequenceTest implements TestBehaviors {
 		s.add(new SuccessNode("1", sb));
 		s.add(new Node() {
 			@Override
-			public State evaluate(Entity e, Agent a) {
+			public Status evaluate(Entity e, Agent a) {
 				sb.append("2");
 				int i = a.blackboard.getInt(nodeId, 0);
 				if (i < 2) {
 					a.blackboard.putInt(nodeId, ++i);
-					return State.RUNNING;
+					return Status.RUNNING;
 				}
-				return State.SUCCESS;
+				return Status.SUCCESS;
 			}
 		});
 		s.add(new FailureNode("3", sb));
-		Node.State state = Node.State.SUCCESS;
+		Node.Status status = Node.Status.SUCCESS;
 		do {
-			state = s.evaluate(e, a);
-			System.out.println(state.toString());
-		} while (state != Node.State.FAILURE);
+			status = s.evaluate(e, a);
+			System.out.println(status.toString());
+		} while (status != Node.Status.FAILURE);
 		// the last 2 represents the SUCCESSful evaluation, so there should be one more than the number of RUNNING evals
 		assertEquals("12223", sb.toString());
 	}

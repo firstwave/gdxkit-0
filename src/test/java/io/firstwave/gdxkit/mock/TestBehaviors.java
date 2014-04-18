@@ -22,13 +22,13 @@ public interface TestBehaviors {
 		}
 
 		@Override
-		public State evaluate(Entity e, Agent a) {
+		public Status evaluate(Entity e, Agent a) {
 			if (sb == null) {
 				System.out.println(nodeId + ":FAILURE");
 			} else {
 				sb.append(s);
 			}
-			return State.FAILURE;
+			return Status.FAILURE;
 		}
 	}
 
@@ -46,13 +46,13 @@ public interface TestBehaviors {
 		}
 
 		@Override
-		public State evaluate(Entity e, Agent a) {
+		public Status evaluate(Entity e, Agent a) {
 			if (sb == null) {
 				System.out.println(nodeId + ":SUCCESS");
 			} else {
 				sb.append(s);
 			}
-			return State.SUCCESS;
+			return Status.SUCCESS;
 		}
 	}
 }

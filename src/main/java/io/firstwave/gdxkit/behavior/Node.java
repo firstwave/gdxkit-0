@@ -8,7 +8,7 @@ import java.util.UUID;
  * First version created on 4/13/14.
  */
 public abstract class Node {
-	public static enum State {
+	public static enum Status {
 		/**
 		 * Indicate that the current evaluation should continue on the next update.
 		 * Parent nodes (composite) should return evaluation to a RUNNING child on evaluation.
@@ -54,7 +54,7 @@ public abstract class Node {
 	 * @param a
 	 * @return
 	 */
-	public abstract State evaluate(Entity e, Agent a);
+	public abstract Status evaluate(Entity e, Agent a);
 
 
 }

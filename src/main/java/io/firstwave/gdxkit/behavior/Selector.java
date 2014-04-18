@@ -15,19 +15,19 @@ public class Selector extends CompositeNode {
 	 * @return
 	 */
 	@Override
-	public State evaluate(Entity e, Agent a) {
+	public Status evaluate(Entity e, Agent a) {
 		int cnt = count();
 		int curr = a.blackboard.getInt(nodeId, 0);
 		for (int i = curr; i < cnt; i++) {
-			State s = get(i).evaluate(e, a);
-			if (s == State.SUCCESS) {
+			Status s = get(i).evaluate(e, a);
+			if (s == Status.SUCCESS) {
 				a.blackboard.remove(nodeId);
-				return State.SUCCESS;
-			} else if (s == State.RUNNING) {
+				return Status.SUCCESS;
+			} else if (s == Status.RUNNING) {
 				a.blackboard.putInt(nodeId, i);
 				return s;
 			}
 		}
-		return State.FAILURE;
+		return Status.FAILURE;
 	}
 }

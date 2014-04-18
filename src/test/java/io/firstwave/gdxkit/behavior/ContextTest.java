@@ -21,7 +21,7 @@ public class ContextTest implements TestBehaviors {
 
 		Node n = new Node() {
 			@Override
-			public State evaluate(Entity e, Agent a) {
+			public Status evaluate(Entity e, Agent a) {
 				return null;
 			}
 		};

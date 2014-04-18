@@ -12,9 +12,9 @@ public abstract class DecoratorNode extends Node {
 	}
 
 	@Override
-	public final State evaluate(Entity e, Agent a) {
+	public final Status evaluate(Entity e, Agent a) {
 		return evaluate(node, e, a);
 	}
 
-	protected abstract State evaluate(Node n, Entity e, Agent a);
+	protected abstract Status evaluate(Node n, Entity e, Agent a);
 }

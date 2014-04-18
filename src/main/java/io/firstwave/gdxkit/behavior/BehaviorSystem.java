@@ -42,8 +42,8 @@ public class BehaviorSystem extends AspectSystem {
 
 	private static final Node VOID_NODE = new Node() {
 		@Override
-		public State evaluate(Entity e, Agent a) {
-			return State.SUCCESS;
+		public Status evaluate(Entity e, Agent a) {
+			return Status.SUCCESS;
 		}
 	};
 

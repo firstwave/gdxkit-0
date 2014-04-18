@@ -23,11 +23,11 @@ public class ComponentDecorator extends DecoratorNode {
 	 * @return
 	 */
 	@Override
-	protected State evaluate(Node n, Entity e, Agent a) {
+	protected Status evaluate(Node n, Entity e, Agent a) {
 		if (e.hasComponent(type)) {
 			return n.evaluate(e, a);
 		} else {
-			return State.FAILURE;
+			return Status.FAILURE;
 		}
 	}
 }

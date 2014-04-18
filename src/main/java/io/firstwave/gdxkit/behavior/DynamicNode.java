@@ -15,10 +15,10 @@ public class DynamicNode extends Node {
 	}
 
 	@Override
-	public State evaluate(Entity e, Agent a) {
+	public Status evaluate(Entity e, Agent a) {
 		Node root = getContext().getRootNode(a.blackboard.getString(blackboardKey));
 		if (root == null) {
-			return State.FAILURE;
+			return Status.FAILURE;
 		}
 		if (root.getContext() != getContext()) {
 			Context.updateTree(getContext(), root);
