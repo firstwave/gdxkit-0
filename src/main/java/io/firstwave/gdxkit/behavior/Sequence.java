@@ -1,7 +1,5 @@
 package io.firstwave.gdxkit.behavior;
 
-import io.firstwave.gdxkit.Entity;
-
 /**
  * Evaluates children sequentially until one returns FAILURE
  * First version created on 4/13/14.
@@ -12,21 +10,21 @@ public class Sequence extends CompositeNode {
 	 * Will evaluate SUCCESS if all children are evaluated, otherwise returns FAILURE.
 	 * An empty child list will always evaluate to SUCCESS
 	 * If a child evaluates to RUNNING, the next update will resume evaluation at that child.
-	 * @param e
-	 * @param a
+	 * @param o
+	 * @param blackboard
 	 * @return
 	 */
 	@Override
-	public Status evaluate(Entity e, Agent a) {
+	public Status evaluate(Object o, IBlackboard blackboard) {
 		int cnt = count();
-		int curr = a.blackboard.getInt(nodeId, 0);
+		int curr = blackboard.getInt(getNodePath(), 0);
 		for (int i = curr; i < cnt; i++) {
-			Status s = get(i).evaluate(e, a);
+			Status s = get(i).evaluate(o, blackboard);
 			if (s == Status.FAILURE) {
-				a.blackboard.remove(nodeId);
+				blackboard.remove(getNodePath());
 				return Status.FAILURE;
 			} else if (s == Status.RUNNING) {
-				a.blackboard.putInt(nodeId, i);
+				blackboard.putInt(getNodePath(), i);
 				return s;
 			}
 		}

@@ -1,7 +1,6 @@
 package io.firstwave.gdxkit.mock;
 
-import io.firstwave.gdxkit.Entity;
-import io.firstwave.gdxkit.behavior.Agent;
+import io.firstwave.gdxkit.behavior.IBlackboard;
 import io.firstwave.gdxkit.behavior.Node;
 
 /**
@@ -22,9 +21,9 @@ public interface TestBehaviors {
 		}
 
 		@Override
-		public Status evaluate(Entity e, Agent a) {
+		public Status evaluate(Object o, IBlackboard bb) {
 			if (sb == null) {
-				System.out.println(nodeId + ":FAILURE");
+				System.out.println(getNodePath() + ":FAILURE");
 			} else {
 				sb.append(s);
 			}
@@ -46,9 +45,9 @@ public interface TestBehaviors {
 		}
 
 		@Override
-		public Status evaluate(Entity e, Agent a) {
+		public Status evaluate(Object o, IBlackboard bb) {
 			if (sb == null) {
-				System.out.println(nodeId + ":SUCCESS");
+				System.out.println(getNodePath() + ":SUCCESS");
 			} else {
 				sb.append(s);
 			}

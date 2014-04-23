@@ -14,18 +14,18 @@ import static org.junit.Assert.assertEquals;
 public class SelectorTest implements TestBehaviors {
 
 	Entity e;
-	Agent a;
+	IBlackboard b;
 
 	@Before
 	public void setUp() {
 		e = EntityFactory.create(null, 0);
-		a = new Agent(null);
+		b = new Blackboard();
 	}
 
 	@Test
 	public void testEmpty() {
 		Sequence s = new Sequence();
-		assertEquals(Node.Status.SUCCESS, s.evaluate(e, a));
+		assertEquals(Node.Status.SUCCESS, s.evaluate(e, b));
 	}
 
 	@Test
@@ -36,7 +36,7 @@ public class SelectorTest implements TestBehaviors {
 		s.add(new FailureNode());
 		s.add(new FailureNode());
 
-		assertEquals(Node.Status.FAILURE, s.evaluate(e, a));
+		assertEquals(Node.Status.FAILURE, s.evaluate(e, b));
 	}
 
 	@Test
@@ -47,7 +47,7 @@ public class SelectorTest implements TestBehaviors {
 		s.add(new FailureNode());
 		s.add(new SuccessNode());
 
-		assertEquals(Node.Status.SUCCESS, s.evaluate(e, a));
+		assertEquals(Node.Status.SUCCESS, s.evaluate(e, b));
 	}
 
 	@Test
@@ -57,11 +57,11 @@ public class SelectorTest implements TestBehaviors {
 		s.add(new FailureNode("1", sb));
 		s.add(new Node() {
 			@Override
-			public Status evaluate(Entity e, Agent a) {
+			public Status evaluate(Object o, IBlackboard bb) {
 				sb.append("2");
-				int i = a.blackboard.getInt(nodeId, 0);
+				int i = bb.getInt(getNodePath(), 0);
 				if (i < 2) {
-					a.blackboard.putInt(nodeId, ++i);
+					bb.putInt(getNodePath(), ++i);
 					return Status.RUNNING;
 				}
 				return Status.FAILURE;
@@ -70,7 +70,7 @@ public class SelectorTest implements TestBehaviors {
 		s.add(new SuccessNode("3", sb));
 		Node.Status status = null;
 		do {
-			status = s.evaluate(e, a);
+			status = s.evaluate(e, b);
 			System.out.println(status.toString());
 		} while (status != Node.Status.SUCCESS);
 		// the last 2 represents the SUCCESSful evaluation, so there should be one more than the number of RUNNING evals

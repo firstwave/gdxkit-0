@@ -1,13 +1,9 @@
 package io.firstwave.gdxkit.behavior;
 
-import io.firstwave.gdxkit.Entity;
-
-import java.util.UUID;
-
 /**
  * First version created on 4/13/14.
  */
-public abstract class Node {
+public abstract class Node<E> {
 	public static enum Status {
 		/**
 		 * Indicate that the current evaluation should continue on the next update.
@@ -24,37 +20,56 @@ public abstract class Node {
 		FAILURE
 	}
 
-	/**
-	 * Each node has access to a unique String id. This id can be used to store node-specific state on a per-agent
-	 * basis in an agent's blackboard
-	 */
-	protected final String nodeId;
+	public static final String NODE_PATH_SEPARATOR = ":";
+	public static final String ROOT_NODE_PATH = "~";
 
-	private Context context;
+	private Node parent;
+	private String nodePath;
 
 	/**
 	 * Construct a new Node instance.
 	 */
-	public Node() {
-		nodeId = UUID.randomUUID().toString();
+	public Node() {}
+
+	/**
+	 * Attach this node to a parent CompositeNode.
+	 * @param parent
+	 */
+	void attach(CompositeNode parent) {
+		if (this.parent != null) {
+			throw new IllegalStateException("this Node is already attached to a CompositeNode");
+		} else {
+			this.parent = parent;
+			nodePath = parent.getNodePath() +
+					NODE_PATH_SEPARATOR +
+					Integer.toString(parent.indexOf(this));
+		}
 	}
 
-
-	void setContext(Context context) {
-		this.context = context;
+	void detach() {
+		parent = null;
+		nodePath = null;
 	}
 
-	protected Context getContext() {
-		return context;
+	/**
+	 * Return a unique path identifying this node within a tree. This path is unique to this node's position within a tree
+	 * and can be used to store node-specific values in an evaluated blackboard.
+	 * A node that has not been attached to a parent composite node will return ROOT_NODE_PATH
+	 * @return
+	 */
+	public String getNodePath() {
+		return (nodePath == null) ? ROOT_NODE_PATH : nodePath;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " [" + getNodePath() + "]";
 	}
 
 	/**
 	 * The evaluate method contains the evaluation logic for each node.
-	 * @param e
-	 * @param a
-	 * @return
 	 */
-	public abstract Status evaluate(Entity e, Agent a);
+	public abstract Status evaluate(E e, IBlackboard blackboard);
 
 
 }

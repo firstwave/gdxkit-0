@@ -1,20 +1,18 @@
 package io.firstwave.gdxkit.behavior;
 
-import io.firstwave.gdxkit.Entity;
-
 /**
  * First version created on 4/13/14.
  */
-public abstract class DecoratorNode extends Node {
+public abstract class DecoratorNode<E> extends Node<E> {
 	private final Node node;
 	public DecoratorNode(Node node) {
 		this.node = node;
 	}
 
 	@Override
-	public final Status evaluate(Entity e, Agent a) {
-		return evaluate(node, e, a);
+	public final Status evaluate(E e, IBlackboard blackboard) {
+		return evaluate(node, e, blackboard);
 	}
 
-	protected abstract Status evaluate(Node n, Entity e, Agent a);
+	protected abstract Status evaluate(Node n, E e, IBlackboard blackboard);
 }

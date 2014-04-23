@@ -1,7 +1,5 @@
 package io.firstwave.gdxkit.behavior;
 
-import io.firstwave.gdxkit.Entity;
-
 import java.util.Random;
 
 /**
@@ -15,8 +13,8 @@ public class RandomSelector extends CompositeNode {
 	}
 
 	@Override
-	public Status evaluate(Entity e, Agent a) {
+	public Status evaluate(Object o, IBlackboard blackboard) {
 		int i = random.nextInt(count());
-		return get(i).evaluate(e, a);
+		return get(i).evaluate(o, blackboard);
 	}
 }

@@ -9,7 +9,7 @@ import java.util.Map;
  * Provides a mapping from String to various serializable types
  * First version created on 4/13/14.
  */
-public class Blackboard {
+public class Blackboard implements IBlackboard {
 
 	private final Map<String, Object> mMap;
 
@@ -30,26 +30,32 @@ public class Blackboard {
 		System.out.println("Couldn't cast mapped value for '" + key + "' to " + type);
 	}
 
+	@Override
 	public boolean containsKey(String key) {
 		return mMap.containsKey(key);
 	}
 
+	@Override
 	public Object get(String key) {
 		return mMap.get(key);
 	}
 
+	@Override
 	public Object remove(String key) {
 		return mMap.remove(key);
 	}
 
+	@Override
 	public void putBoolean(String key, boolean value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public boolean getBoolean(String key) {
 		return getBoolean(key, false);
 	}
 
+	@Override
 	public boolean getBoolean(String key, boolean defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -61,10 +67,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putBooleanArray(String key, boolean[] value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public boolean[] getBooleanArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -76,29 +84,34 @@ public class Blackboard {
 		}
 	}
 
-	public void putBlackboard(String key, Blackboard value) {
+	@Override
+	public void putBlackboard(String key, IBlackboard value) {
 		mMap.put(key, value);
 	}
 
-	public Blackboard getBlackboard(String key) {
+	@Override
+	public IBlackboard getBlackboard(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
 		try {
-			return (Blackboard) rv;
+			return (IBlackboard) rv;
 		} catch(ClassCastException e) {
 			typeWarning(key, "Blackboard");
 			return null;
 		}
 	}
 
+	@Override
 	public void putByte(String key, byte value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public byte getByte(String key) {
 		return getByte(key, (byte) 0);
 	}
 
+	@Override
 	public byte getByte(String key, byte defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -110,10 +123,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putByteArray(String key, byte[] value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public byte[] getByteArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -125,14 +140,17 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putChar(String key, char value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public char getChar(String key) {
 		return getChar(key, (char) 0);
 	}
 
+	@Override
 	public char getChar(String key, char defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -144,10 +162,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putCharArray(String key, char[] value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public char[] getCharArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -159,10 +179,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putCharSequence(String key, CharSequence value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public CharSequence getCharSequence(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -174,14 +196,17 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putDouble(String key, double value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public double getDouble(String key) {
 		return getDouble(key, 0.0);
 	}
 
+	@Override
 	public double getDouble(String key, double defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -193,10 +218,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putDoubleArray(String key, double[] value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public double[] getDoubleArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -208,14 +235,17 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putFloat(String key, float value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public float getFloat(String key) {
 		return getFloat(key, 0.0f);
 	}
 
+	@Override
 	public float getFloat(String key, float defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -227,10 +257,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putFloatArray(String key, float[] value) {
 		mMap.put(key, value);
 	}
 	
+	@Override
 	public float[] getFloatArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -242,14 +274,17 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putInt(String key, int value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public int getInt(String key) {
 		return getInt(key, 0);
 	}
 
+	@Override
 	public int getInt(String key, int defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -261,10 +296,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putIntArray(String key, int[] value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public int[] getIntArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -276,14 +313,17 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putLong(String key, long value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public long getLong(String key) {
 		return getLong(key, 0);
 	}
 
+	@Override
 	public long getLong(String key, long defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -295,10 +335,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putLongArray(String key, long[] value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public long[] getLongArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -310,14 +352,17 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putShort(String key, short value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public short getShort(String key) {
 		return getShort(key, (short) 0);
 	}
 
+	@Override
 	public short getShort(String key, short defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -329,10 +374,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putShortArray(String key, short[] value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public short[] getShortArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
@@ -344,14 +391,17 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putString(String key, String value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public String getString(String key) {
 		return getString(key, null);
 	}
 
+	@Override
 	public String getString(String key, String defaultValue) {
 		Object rv = mMap.get(key);
 		if (rv == null) return defaultValue;
@@ -363,10 +413,12 @@ public class Blackboard {
 		}
 	}
 
+	@Override
 	public void putStringArray(String key, String[] value) {
 		mMap.put(key, value);
 	}
 
+	@Override
 	public String[] getStringArray(String key) {
 		Object rv = mMap.get(key);
 		if (rv == null) return null;
