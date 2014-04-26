@@ -130,10 +130,19 @@ public class EntityManager implements ComponentManager.Observer {
 
 	}
 
+	/**
+	 * Add an Observer that gets notification of Entity lifecycle events.
+	 * @param o
+	 */
 	public void addObserver(Observer o) {
 		observers.add(o);
 	}
 
+	/**
+	 * REmove a previously registered Observer
+	 * @param o
+	 * @return
+	 */
 	public boolean removeObserver(Observer o) {
 		return observers.remove(o);
 	}
