@@ -33,8 +33,5 @@ public class AspectTest implements MockComponents {
 		assertTrue(a.check(e));
 		a.exclude(C2_TYPE);
 		assertFalse(a.check(e));
-
-		a = Aspect.getEmpty(); // there's no point to have an empty aspect. Make this match everything, but give it a better name.W
-		assertTrue(a.check(e));
 	}
 }

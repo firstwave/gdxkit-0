@@ -151,22 +151,6 @@ public class Aspect {
 		return aspect;
 	}
 
-	/**
-	 * Creates and returns an empty aspect. This can be used if you want a system that processes no entities, but
-	 * still gets invoked. Typical usages is when you need to create special purpose systems for debug rendering,
-	 * like rendering FPS, how many entities are active in the world, etc.
-	 *
-	 * You can also use the all, one and exclude methods on this aspect, so if you wanted to create a system that
-	 * processes only entities possessing just one of the components A or B or C, then you can do:
-	 * Aspect.getEmpty().one(A,B,C);
-	 *
-	 * @return an empty Aspect that will reject all entities.
-	 */
-	public static Aspect getEmpty() {
-		// FIXME: there's little point in having an empty aspect. Come up with a way to express "matches all"
-		// and remove the empty checks at the beginning of check()
-		return new Aspect();
-	}
 
 	/**
 	 * Will check if the entity is of interest to this Aspect.
