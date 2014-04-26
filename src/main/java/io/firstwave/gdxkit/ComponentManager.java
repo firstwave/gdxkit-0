@@ -82,10 +82,10 @@ public class ComponentManager {
 	 * @param type
 	 * @return the Component of the given type that is associated with the given Entity.
 	 */
-	public Component getEntityComponent(Entity e, Class<? extends Component> type) {
+	public <T extends Component> T getEntityComponent(Entity e, Class<T> type) {
 		IntMap<Component> map = componentTable.get(Component.typeIndex.forType(type), null);
 		if (map == null) return null;
-		return map.get(e.id, null);
+		return type.cast(map.get(e.id, null));
 	}
 
 	/**

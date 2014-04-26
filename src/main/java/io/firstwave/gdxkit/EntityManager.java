@@ -78,6 +78,10 @@ public class EntityManager implements ComponentManager.Observer {
 		return (!disabled.contains(e.id));
 	}
 
+	public boolean isEntityDestroyed(Entity e) {
+		return (!entities.containsKey(e.id));
+	}
+
 	public View getView(Aspect aspect) {
 		WeakReference<View> ref = views.get(aspect);
 		View rv;
