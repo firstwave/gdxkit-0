@@ -2,9 +2,7 @@ package io.firstwave.gdxkit;
 
 import com.badlogic.gdx.utils.IntMap;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Manages Component relationships with Entities.
@@ -23,17 +21,18 @@ public class ComponentManager {
 	private final IntMap<Component> removed;
 
 	/**
-	 * This map uses Entity ids as keys. The inner BotSets indicate which components an entity has
+	 * This map uses Entity ids as keys. The inner BitSets indicate which components an entity has
 	 */
 	private final IntMap<BitSet> componentBits;
 
 	private final Map<Class<? extends Component>, ComponentMap> componentMaps;
-	private Listener listener = VOID_LISTENER;
+	private Set<Observer> observers;
 	public ComponentManager() {
 		componentTable = new IntMap<IntMap<Component>>();
 		componentBits = new IntMap<BitSet>();
 		componentMaps = new HashMap<Class<? extends Component>, ComponentMap>();
 		removed = new IntMap<Component>();
+		observers = new HashSet<Observer>();
 	}
 
 	private IntMap<Component> emptyMap() {
@@ -43,7 +42,7 @@ public class ComponentManager {
 	/**
 	 * Associates the given component with the given entity. An entity may only have one of each type of component,
 	 * so if a component of the same type is already associated with the entity, the old component will be overwritten.
-	 * A listener event will be sent even if the Entity already had an existing component of the same type.
+	 * A observers event will be sent even if the Entity already had an existing component of the same type.
 	 * null values are not permitted.
 	 * @param e the Entity to associate the Component with
 	 * @param c the Component to associate with the Entity
@@ -52,17 +51,25 @@ public class ComponentManager {
 		int i = Component.typeIndex.forType(c.getClass());
 		IntMap<Component> map = componentTable.get(i, null);
 		BitSet bits = componentBits.get(e.id, null);
+		boolean added = false;
 		if (map == null) {
 			map = emptyMap();
 			componentTable.put(i, map);
+			added = true;
 		}
 		if (bits == null) {
 			bits = new BitSet();
 			componentBits.put(e.id, bits);
+			added = true;
 		}
 		map.put(e.id, c);
 		bits.set(i);
-		listener.onComponentAdded(e, c.getClass());
+
+		if (added) {
+			for (Observer o : observers) {
+				o.onComponentAdded(e, c.getClass());
+			}
+		}
 	}
 
 	/**
@@ -80,7 +87,7 @@ public class ComponentManager {
 
 	/**
 	 * Disassociates the Component of the given type from the given Entity.
-	 * A listener event will be sent in the event that a Component will be removed.
+	 * A observer event will be sent in the event that a Component will be removed.
 	 * @param e
 	 * @param type
 	 * @return true if a Component was removed.
@@ -91,24 +98,19 @@ public class ComponentManager {
 		BitSet bits = componentBits.get(e.id, null);
 		if (map == null) return false;
 		if (bits.get(i)) {
-			// we need to notify the listener *before* actually removing the component from the table
-			listener.onComponentRemoved(e, type);
+			// we need to notify the observer *before* actually removing the component from the table
+			for (Observer o : observers) {
+				o.onBeforeComponentRemoved(e, type);
+			}
 			removed.put(e.id, map.get(e.id));
 			map.put(e.id, null);
 			bits.clear(i);
+			for (Observer o : observers) {
+				o.onComponentRemoved(e, type);
+			}
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Returns the Component most recently removed from the given entity. This is useful if you need to do cleanup after
-	 * receiving a entityRemoved signal. This is generally used to make recently removed components available to a ComponentMap
-	 * @param e
-	 * @return
-	 */
-	Component getLastRemovedEntityComponent(Entity e) {
-		return removed.get(e.id);
 	}
 
 	/**
@@ -125,7 +127,8 @@ public class ComponentManager {
 	}
 
 	/**
-	 * Return an array containing all of an entity's components.
+	 * Return an array containing all of an entity's components. This can be a potentially costly operation, relatively speaking.
+	 * You should usually prefer to get a specific component type instead.
 	 * @return
 	 */
 	private static final Component[] EMPTY_COMPONENT_ARRAY = new Component[0];
@@ -173,36 +176,29 @@ public class ComponentManager {
 	}
 
 	/**
-	 * Set the object that will receive notifications of updates to the component table
-	 * @param listener
+	 * Add an object that will receive notifications of updates to the component table
+	 * @param observer
 	 */
-	protected void setListener(Listener listener) {
-		if (listener == null) {
-			this.listener = VOID_LISTENER;
-		} else {
-			this.listener = listener;
-		}
+	public void addObserver(Observer observer) {
+		observers.add(observer);
 	}
 
 	/**
-	 * Easier than checking for null.
+	 * Unregister the given observer
+	 * @param observer
+	 * @return true is the observer was found and unregistered
 	 */
-	private static final Listener VOID_LISTENER = new Listener() {
-		@Override
-		public void onComponentAdded(Entity e, Class<? extends Component> type) {}
-
-		@Override
-		public void onComponentRemoved(Entity e, Class<? extends Component> type) {}
-	};
+	public boolean removeObserver(Observer observer) {
+		return observers.remove(observer);
+	}
 
 	/**
 	 * Allows listening to changes to the internal table.
 	 * Note that for each method, the indicated component type is already/still present in the internal table.
 	 */
-	public static interface Listener {
+	public static interface Observer {
 		/**
 		 * This method is called AFTER the component has been added to the internal table.
-		 * As such, the component has already been added to the lookup table.
 		 * @param e
 		 * @param type
 		 */
@@ -210,8 +206,14 @@ public class ComponentManager {
 
 		/**
 		 * This method is called BEFORE the component is removed from the internal table.
-		 * As such, the component has not yet been removed from the internal table.
-		 * This allows a listener to perform cleanup that may be dependent on component data
+		 * This allows a observers to perform cleanup that may be dependent on component data
+		 * @param e
+		 * @param type
+		 */
+		public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type);
+
+		/**
+		 * This method is called AFTER the component has been removed from the internal table.
 		 * @param e
 		 * @param type
 		 */

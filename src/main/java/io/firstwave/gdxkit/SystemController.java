@@ -5,23 +5,14 @@ import java.util.*;
 /**
  * First version created on 3/30/14.
  */
-public class Engine {
-	public final EntityManager entityManager;
+public class SystemController {
 	private final List<BaseSystem> systems;
 	private final Map<Class<? extends BaseSystem>, BaseSystem> systemsByType;
 	private float lastDelta;
 
-	private final Map<Class<?>, Object> resources;
-
-	public Engine() {
-		this(new EntityManager());
-	}
-
-	public Engine(EntityManager entityManager) {
-		this.entityManager = entityManager;
+	public SystemController() {
 		systems = new ArrayList<BaseSystem>();
 		systemsByType = new HashMap<Class<? extends BaseSystem>, BaseSystem>();
-		resources = new HashMap<Class<?>, Object>();
 		lastDelta = 0.0f;
 	}
 
@@ -52,24 +43,17 @@ public class Engine {
 		return type.cast(rv);
 	}
 
+	public void initialize() {
+		for (BaseSystem s : systems) {
+			s.initialize();
+		}
+	}
+
 	public void updateSystems(float delta) {
 		lastDelta = delta;
 		for (BaseSystem s : systems) {
 			s.update(delta);
 		}
-	}
-
-	public void putResource(Object resource) {
-		if (resources.containsKey(resources.getClass())) {
-			throw new IllegalStateException("Cannot set two resources of the same type!");
-		}
-		resources.put(resource.getClass(), resource);
-	}
-
-	public <T> T getResource(Class<T> type) {
-		Object rv = resources.get(type);
-		if (rv == null) return null;
-		return type.cast(rv);
 	}
 
 	public float getDelta() {

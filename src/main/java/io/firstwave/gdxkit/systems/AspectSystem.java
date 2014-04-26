@@ -6,13 +6,14 @@ import io.firstwave.gdxkit.util.Signal;
 /**
  * First version created on 3/30/14.
  */
-public abstract class AspectSystem extends BaseSystem {
+public abstract class AspectSystem extends EntitySystem {
 	private View aspectView;
 	private final Aspect aspect;
 	private final Signal.Listener<Entity> entityAddedListener;
 	private final Signal.Listener<Entity> entityRemovedListener;
 
-	public AspectSystem(Aspect aspect) {
+	public AspectSystem(EntityManager manager, Aspect aspect) {
+		super(manager);
 		this.aspect = aspect;
 		entityAddedListener = new Signal.Listener<Entity>() {
 			@Override
@@ -29,9 +30,8 @@ public abstract class AspectSystem extends BaseSystem {
 	}
 
 	@Override
-	protected void onRegistered(Engine engine) {
-		super.onRegistered(engine);
-		aspectView = engine.entityManager.getView(aspect);
+	protected void onRegistered() {
+		aspectView = entityManager.getView(aspect);
 		for (Entity e : aspectView) {
 			onEntityAdded(e);
 		}

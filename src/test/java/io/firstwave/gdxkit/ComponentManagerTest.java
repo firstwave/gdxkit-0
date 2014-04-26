@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -57,13 +56,6 @@ public class ComponentManagerTest implements MockComponents{
 		assertFalse(cm.removeAllEntityComponents(e));
 	}
 
-	@Test
-	public void testLastRemoved() {
-		cm.setEntityComponent(e, C1);
-		assertNull(cm.getLastRemovedEntityComponent(e));
-		cm.removeEntityComponent(e, C1_TYPE);
-		assertEquals(C1, cm.getLastRemovedEntityComponent(e));
-	}
 
 	@Test
 	public void testMapIdentity() {
@@ -75,10 +67,10 @@ public class ComponentManagerTest implements MockComponents{
 
 
 	@Test
-	public void testListenerEvents() {
+	public void testObserverEvents() {
 		final StringBuilder sb = new StringBuilder();
 		StringBuilder rec = new StringBuilder();
-		ComponentManager.Listener l = new ComponentManager.Listener() {
+		ComponentManager.Observer l = new ComponentManager.Observer() {
 			@Override
 			public void onComponentAdded(Entity e, Class<? extends Component> type) {
 				sb.append("a");
@@ -88,14 +80,19 @@ public class ComponentManagerTest implements MockComponents{
 			}
 
 			@Override
-			public void onComponentRemoved(Entity e, Class<? extends Component> type) {
+			public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 				sb.append("r");
 				sb.append(e.id);
 				sb.append(Component.typeIndex.forType(type));
 				assertTrue(cm.entityHasComponent(e, type));
 			}
+
+			@Override
+			public void onComponentRemoved(Entity e, Class<? extends Component> type) {
+				sb.append("R");
+			}
 		};
-		cm.setListener(l);
+		cm.addObserver(l);
 
 		Entity e2 = new Entity(null, 7);
 
@@ -104,9 +101,8 @@ public class ComponentManagerTest implements MockComponents{
 		rec.append(e.id);
 		rec.append(C1_INDEX);
 		cm.setEntityComponent(e, C1);
-		rec.append("a");
-		rec.append(e.id);
-		rec.append(C1_INDEX);
+		// we've just updated an existing component with a new instance, don't notify
+
 		cm.setEntityComponent(e, C2);
 		rec.append("a");
 		rec.append(e.id);
@@ -123,11 +119,13 @@ public class ComponentManagerTest implements MockComponents{
 		rec.append("r");
 		rec.append(e2.id);
 		rec.append(C2_INDEX);
+		rec.append("R");
 
 		cm.removeEntityComponent(e, C1_TYPE);
 		rec.append("r");
 		rec.append(e.id);
 		rec.append(C1_INDEX);
+		rec.append("R");
 
 		assertEquals(rec.toString(), sb.toString());
 	}

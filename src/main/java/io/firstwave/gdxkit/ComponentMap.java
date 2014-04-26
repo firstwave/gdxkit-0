@@ -1,6 +1,11 @@
 package io.firstwave.gdxkit;
 
 /**
+ * Slightly simplifies the code needed to fetch Component af a specific type.
+ * Rather than having to type:
+ * <tt>Entity#getComponent(Component.class)</tt>
+ * you can simply create a typed map, initialize it with a component manager and type:
+ * <tt>component.get(Entity)</tt>
  * First version created on 3/30/14.
  */
 public class ComponentMap<T extends Component> {
@@ -21,21 +26,4 @@ public class ComponentMap<T extends Component> {
 		return type.cast(manager.getEntityComponent(e, type));
 	}
 
-	/**
-	 * The main difference between this and get is that safeGet will check the recently removed cache if the component is not
-	 * found in the main component table. The component manager caches the last component removed from an entity, so use
-	 * this if you need to do cleanup in a component removed event.
-	 * @param e
-	 * @return
-	 */
-	public T getSafe(Entity e) {
-		Component rv = manager.getEntityComponent(e, type);
-		if (rv != null) return type.cast(rv);
-		// now we check the cache to see if there's one hanging around in the cache
-		rv = manager.getLastRemovedEntityComponent(e);
-		if (rv != null && type.isInstance(rv)) {
-			return type.cast(rv);
-		}
-		return null;
-	}
 }

@@ -111,6 +111,11 @@ public class EntityManager implements ComponentManager.Observer {
 		}
 	}
 
+	@Override
+	public void onComponentRemoved(Entity e, Class<? extends Component> type) {
+
+	}
+
 	private class EntityPool {
 		private final Array<Entity> pool;
 		private int nextId;

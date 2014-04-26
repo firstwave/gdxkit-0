@@ -12,15 +12,6 @@ public final class Entity {
 		this.id = id;
 	}
 
-	/**
-	 * Check whether this entity has a component of the given type
-	 * @param type
-	 * @return
-	 */
-	public boolean hasComponent(Class<? extends Component> type) {
-		return manager.componentManager.entityHasComponent(this, type);
-	}
-
 	@Override
 	public String toString() {
 		return String.format("Entity[%d]", id);

@@ -5,18 +5,30 @@ package io.firstwave.gdxkit;
  */
 public abstract class BaseSystem implements Comparable<BaseSystem> {
 	protected int priority;
-	protected Engine engine;
+	private SystemController systemController;
 
 	public BaseSystem() {
 		// default no-arg constructor
 	}
 
-	final void register(Engine engine) {
-		this.engine = engine;
-		onRegistered(engine);
+	public SystemController getController() {
+		return systemController;
 	}
 
-	protected void onRegistered(Engine engine) {
+	final void register(SystemController systemController) {
+		this.systemController = systemController;
+		onRegistered();
+	}
+
+	protected void onRegistered() {
+		// no default behavior
+	}
+
+	final void initialize() {
+		onInitialized();
+	}
+
+	protected void onInitialized() {
 		// no default behavior
 	}
 
@@ -33,7 +45,7 @@ public abstract class BaseSystem implements Comparable<BaseSystem> {
 	protected abstract void onUpdate(float delta);
 
 	final void unregister() {
-		this.engine = null;
+		this.systemController = null;
 		onUnregistered();
 	}
 
