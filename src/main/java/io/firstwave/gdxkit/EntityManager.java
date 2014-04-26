@@ -104,6 +104,11 @@ public class EntityManager implements ComponentManager.Observer {
 	}
 
 	@Override
+	public void onComponentUpdated(Entity e, Class<? extends Component> type) {
+
+	}
+
+	@Override
 	public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 		Map.Entry<Aspect, WeakReference<View>> entry;
 		for (Iterator<Map.Entry<Aspect, WeakReference<View>>> iter = views.entrySet().iterator(); iter.hasNext();) {

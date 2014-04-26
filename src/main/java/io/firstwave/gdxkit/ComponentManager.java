@@ -66,9 +66,11 @@ public class ComponentManager {
 		boolean added = !bits.get(i);
 		bits.set(i);
 
-		if (added) {
-			for (Observer o : observers) {
+		for (Observer o : observers) {
+			if (added) {
 				o.onComponentAdded(e, c.getClass());
+			} else {
+				o.onComponentUpdated(e, c.getClass());
 			}
 		}
 	}
@@ -200,10 +202,21 @@ public class ComponentManager {
 	public static interface Observer {
 		/**
 		 * This method is called AFTER the component has been added to the internal table.
+		 * This will only be called if the entity did not have the component type prior to the change
 		 * @param e
 		 * @param type
 		 */
 		public void onComponentAdded(Entity e, Class<? extends Component> type);
+
+		/**
+		 * This method is called when a component is replaced by a new component of the same type.
+		 * Note, this will not be called if onComponentAdded has already been called for the change
+		 * This is useful to provide a generic mechanism to monitor changes to immutable Component types
+		 * @param e
+		 * @param type
+		 */
+		public void onComponentUpdated(Entity e, Class<? extends Component> type);
+
 
 		/**
 		 * This method is called BEFORE the component is removed from the internal table.

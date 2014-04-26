@@ -80,6 +80,14 @@ public class ComponentManagerTest implements MockComponents{
 			}
 
 			@Override
+			public void onComponentUpdated(Entity e, Class<? extends Component> type) {
+				sb.append("u");
+				sb.append(e.id);
+				sb.append(Component.typeIndex.forType(type));
+				assertTrue(cm.entityHasComponent(e, type));
+			}
+
+			@Override
 			public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 				sb.append("r");
 				sb.append(e.id);
@@ -90,6 +98,7 @@ public class ComponentManagerTest implements MockComponents{
 			@Override
 			public void onComponentRemoved(Entity e, Class<? extends Component> type) {
 				sb.append("R");
+				assertFalse(cm.entityHasComponent(e, type));
 			}
 		};
 		cm.addObserver(l);
@@ -100,20 +109,28 @@ public class ComponentManagerTest implements MockComponents{
 		rec.append("a");
 		rec.append(e.id);
 		rec.append(C1_INDEX);
+
+		
 		cm.setEntityComponent(e, C1);
-		// we've just updated an existing component with a new instance, don't notify
+		rec.append("u");
+		rec.append(e.id);
+		rec.append(C1_INDEX);
+
 
 		cm.setEntityComponent(e, C2);
 		rec.append("a");
 		rec.append(e.id);
 		rec.append(C2_INDEX);
 
+
 		cm.setEntityComponent(e2, C2);
 		rec.append("a");
 		rec.append(e2.id);
 		rec.append(C2_INDEX);
+
+
 		cm.removeEntityComponent(e2, C1_TYPE);
-		// don't record anything because we should receive a notification
+		// don't record anything because we shouldn't receive a notification
 
 		cm.removeAllEntityComponents(e2);
 		rec.append("r");

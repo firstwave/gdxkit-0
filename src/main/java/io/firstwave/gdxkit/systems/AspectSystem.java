@@ -46,6 +46,7 @@ public abstract class AspectSystem extends EntitySystem {
 		for (Entity e : aspectView) {
 			onEntityRemoved(e);
 		}
+		aspectView = null;
 	}
 
 	@Override

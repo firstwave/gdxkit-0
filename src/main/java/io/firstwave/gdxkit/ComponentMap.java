@@ -3,7 +3,7 @@ package io.firstwave.gdxkit;
 /**
  * Slightly simplifies the code needed to fetch Component af a specific type.
  * Rather than having to type:
- * <tt>Entity#getComponent(Component.class)</tt>
+ * <tt>EntityManager#getEntityComponent(Entity, Component.class)</tt>
  * you can simply create a typed map, initialize it with a component manager and type:
  * <tt>component.get(Entity)</tt>
  * First version created on 3/30/14.
