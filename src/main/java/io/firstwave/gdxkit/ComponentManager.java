@@ -51,18 +51,19 @@ public class ComponentManager {
 		int i = Component.typeIndex.forType(c.getClass());
 		IntMap<Component> map = componentTable.get(i, null);
 		BitSet bits = componentBits.get(e.id, null);
-		boolean added = false;
 		if (map == null) {
 			map = emptyMap();
 			componentTable.put(i, map);
-			added = true;
 		}
 		if (bits == null) {
 			bits = new BitSet();
 			componentBits.put(e.id, bits);
-			added = true;
 		}
 		map.put(e.id, c);
+		// check if the component was already set
+		// to ensure we don't notify observers when
+		// a component is merely replaced
+		boolean added = !bits.get(i);
 		bits.set(i);
 
 		if (added) {

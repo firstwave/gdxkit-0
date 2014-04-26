@@ -16,6 +16,8 @@ public class EntityManager implements ComponentManager.Observer {
 	private final IntSet disabled;
 	private final EntityPool pool;
 	private final Map<Aspect, WeakReference<View>> views;
+	private final Set<Observer> observers;
+
 
 	public final ComponentManager componentManager;
 
@@ -28,6 +30,7 @@ public class EntityManager implements ComponentManager.Observer {
 		disabled = new IntSet();
 		pool = new EntityPool();
 		views = new HashMap<Aspect, WeakReference<View>>();
+		observers = new HashSet<Observer>();
 		this.componentManager = componentManager;
 		componentManager.addObserver(this);
 	}
@@ -39,6 +42,9 @@ public class EntityManager implements ComponentManager.Observer {
 	public Entity createEntity() {
 		Entity rv = pool.get();
 		entities.put(rv.id, rv);
+		for (Observer o : observers) {
+			o.onEntityCreated(rv);
+		}
 		return rv;
 	}
 
@@ -47,6 +53,9 @@ public class EntityManager implements ComponentManager.Observer {
 		disabled.remove(e.id);
 		entities.remove(e.id);
 		pool.release(e);
+		for (Observer o : observers) {
+			o.onEntityDestroyed(e);
+		}
 	}
 
 	public void setEntityEnabled(Entity e, boolean enabled) {
@@ -114,6 +123,19 @@ public class EntityManager implements ComponentManager.Observer {
 	@Override
 	public void onComponentRemoved(Entity e, Class<? extends Component> type) {
 
+	}
+
+	public void addObserver(Observer o) {
+		observers.add(o);
+	}
+
+	public boolean removeObserver(Observer o) {
+		return observers.remove(o);
+	}
+
+	public static interface Observer {
+		public void onEntityCreated(Entity e);
+		public void onEntityDestroyed(Entity e);
 	}
 
 	private class EntityPool {
