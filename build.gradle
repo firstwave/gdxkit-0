@@ -13,6 +13,6 @@ repositories {
 }
 
 dependencies {
-    compile 'com.badlogicgames.gdx:gdx:0.9.9'
+    compile 'com.badlogicgames.gdx:gdx:1.0.0'
     testCompile 'junit:junit:4.11'
 }

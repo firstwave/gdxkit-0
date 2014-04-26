@@ -5,15 +5,12 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 
 import java.lang.ref.WeakReference;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * First version created on 3/29/14.
  */
-public class EntityManager implements ComponentManager.Listener {
+public class EntityManager implements ComponentManager.Observer {
 
 	private final IntMap<Entity> entities;
 	private final IntSet disabled;
@@ -32,7 +29,7 @@ public class EntityManager implements ComponentManager.Listener {
 		pool = new EntityPool();
 		views = new HashMap<Aspect, WeakReference<View>>();
 		this.componentManager = componentManager;
-		componentManager.setListener(this);
+		componentManager.addObserver(this);
 	}
 
 	public Entity getEntity(int id) {
@@ -98,7 +95,7 @@ public class EntityManager implements ComponentManager.Listener {
 	}
 
 	@Override
-	public void onComponentRemoved(Entity e, Class<? extends Component> type) {
+	public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 		Map.Entry<Aspect, WeakReference<View>> entry;
 		for (Iterator<Map.Entry<Aspect, WeakReference<View>>> iter = views.entrySet().iterator(); iter.hasNext();) {
 			entry = iter.next();
