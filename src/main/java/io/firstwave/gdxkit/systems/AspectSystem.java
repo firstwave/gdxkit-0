@@ -35,14 +35,14 @@ public abstract class AspectSystem extends EntitySystem {
 		for (Entity e : aspectView) {
 			onEntityAdded(e);
 		}
-		aspectView.entityAdded.register(entityAddedListener);
-		aspectView.entityRemoved.register(entityRemovedListener);
+//		aspectView.entityAdded.register(entityAddedListener);
+//		aspectView.entityRemoved.register(entityRemovedListener);
 	}
 
 	@Override
 	protected void onUnregistered() {
-		aspectView.entityAdded.unregister(entityAddedListener);
-		aspectView.entityRemoved.unregister(entityRemovedListener);
+//		aspectView.entityAdded.unregister(entityAddedListener);
+//		aspectView.entityRemoved.unregister(entityRemovedListener);
 		for (Entity e : aspectView) {
 			onEntityRemoved(e);
 		}

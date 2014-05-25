@@ -1,8 +1,11 @@
 package io.firstwave.gdxkit;
 
 import com.badlogic.gdx.utils.IntMap;
+import io.firstwave.gdxkit.util.ImmutableBitSet;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages Component relationships with Entities.
@@ -26,13 +29,13 @@ public class ComponentManager {
 	private final IntMap<BitSet> componentBits;
 
 	private final Map<Class<? extends Component>, ComponentMap> componentMaps;
-	private Set<Observer> observers;
+	private EntityObserverAdapter observers;
 	public ComponentManager() {
 		componentTable = new IntMap<IntMap<Component>>();
 		componentBits = new IntMap<BitSet>();
 		componentMaps = new HashMap<Class<? extends Component>, ComponentMap>();
 		removed = new IntMap<Component>();
-		observers = new HashSet<Observer>();
+		observers = new EntityObserverAdapter();
 	}
 
 	private IntMap<Component> emptyMap() {
@@ -65,14 +68,12 @@ public class ComponentManager {
 		// a component is merely replaced
 		boolean added = !bits.get(i);
 		bits.set(i);
-
-		for (Observer o : observers) {
-			if (added) {
-				o.onComponentAdded(e, c.getClass());
-			} else {
-				o.onComponentUpdated(e, c.getClass());
-			}
+		if (added) {
+			observers.onComponentAdded(e, c.getClass());
+		} else {
+			observers.onComponentUpdated(e, c.getClass());
 		}
+
 	}
 
 	/**
@@ -102,15 +103,11 @@ public class ComponentManager {
 		if (map == null) return false;
 		if (bits.get(i)) {
 			// we need to notify the observer *before* actually removing the component from the table
-			for (Observer o : observers) {
-				o.onBeforeComponentRemoved(e, type);
-			}
+			observers.onBeforeComponentRemoved(e, type);
 			removed.put(e.id, map.get(e.id));
 			map.put(e.id, null);
 			bits.clear(i);
-			for (Observer o : observers) {
-				o.onComponentRemoved(e, type);
-			}
+			observers.onComponentRemoved(e, type);
 			return true;
 		}
 		return false;
@@ -158,8 +155,13 @@ public class ComponentManager {
 		return bits.get(Component.typeIndex.forType(type));
 	}
 
-	BitSet getEntityComponentBits(Entity e) {
-		return componentBits.get(e.id);
+	private static final ImmutableBitSet EMPTY_BIT_SET = new ImmutableBitSet();
+	public ImmutableBitSet getEntityComponentBits(Entity e) {
+		BitSet rv = componentBits.get(e.id);
+		if (rv == null) {
+			return EMPTY_BIT_SET;
+		}
+		return new ImmutableBitSet(rv);
 	}
 
 	/**
@@ -179,58 +181,22 @@ public class ComponentManager {
 	}
 
 	/**
-	 * Add an object that will receive notifications of updates to the component table
+	 * Add an object that will receive notifications of updates to the component table.
+	 * Observers should only receive Component added/removed events.
 	 * @param observer
 	 */
-	public void addObserver(Observer observer) {
-		observers.add(observer);
+	protected void addObserver(EntityObserver observer) {
+		observers.addObserver(observer);
 	}
 
 	/**
 	 * Unregister the given observer
+	 * Observers should only receive Component added/removed events.
 	 * @param observer
 	 * @return true is the observer was found and unregistered
 	 */
-	public boolean removeObserver(Observer observer) {
-		return observers.remove(observer);
+	protected boolean removeObserver(EntityObserver observer) {
+		return observers.removeObserver(observer);
 	}
 
-	/**
-	 * Allows listening to changes to the internal table.
-	 * Note that for each method, the indicated component type is already/still present in the internal table.
-	 */
-	public static interface Observer {
-		/**
-		 * This method is called AFTER the component has been added to the internal table.
-		 * This will only be called if the entity did not have the component type prior to the change
-		 * @param e
-		 * @param type
-		 */
-		public void onComponentAdded(Entity e, Class<? extends Component> type);
-
-		/**
-		 * This method is called when a component is replaced by a new component of the same type.
-		 * Note, this will not be called if onComponentAdded has already been called for the change
-		 * This is useful to provide a generic mechanism to monitor changes to immutable Component types
-		 * @param e
-		 * @param type
-		 */
-		public void onComponentUpdated(Entity e, Class<? extends Component> type);
-
-
-		/**
-		 * This method is called BEFORE the component is removed from the internal table.
-		 * This allows a observers to perform cleanup that may be dependent on component data
-		 * @param e
-		 * @param type
-		 */
-		public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type);
-
-		/**
-		 * This method is called AFTER the component has been removed from the internal table.
-		 * @param e
-		 * @param type
-		 */
-		public void onComponentRemoved(Entity e, Class<? extends Component> type);
-	}
 }

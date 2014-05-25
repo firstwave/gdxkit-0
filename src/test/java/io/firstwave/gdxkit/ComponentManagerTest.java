@@ -70,7 +70,7 @@ public class ComponentManagerTest implements MockComponents{
 	public void testObserverEvents() {
 		final StringBuilder sb = new StringBuilder();
 		StringBuilder rec = new StringBuilder();
-		ComponentManager.Observer l = new ComponentManager.Observer() {
+		DefaultEntityObserver l = new DefaultEntityObserver() {
 			@Override
 			public void onComponentAdded(Entity e, Class<? extends Component> type) {
 				sb.append("a");

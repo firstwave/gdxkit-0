@@ -10,14 +10,13 @@ import java.util.*;
 /**
  * First version created on 3/29/14.
  */
-public class EntityManager implements ComponentManager.Observer {
+public class EntityManager {
 
 	private final IntMap<Entity> entities;
 	private final IntSet disabled;
 	private final EntityPool pool;
-	private final Map<Aspect, WeakReference<View>> views;
-	private final Set<Observer> observers;
-
+	private final Map<Aspect, WeakReference<View>> viewMap;
+	private final EntityObserverAdapter observers;
 
 	public final ComponentManager componentManager;
 
@@ -29,10 +28,11 @@ public class EntityManager implements ComponentManager.Observer {
 		entities = new IntMap<Entity>();
 		disabled = new IntSet();
 		pool = new EntityPool();
-		views = new HashMap<Aspect, WeakReference<View>>();
-		observers = new HashSet<Observer>();
+		viewMap = new HashMap<Aspect, WeakReference<View>>();
+
 		this.componentManager = componentManager;
-		componentManager.addObserver(this);
+		observers = new EntityObserverAdapter();
+		componentManager.addObserver(observers);
 	}
 
 	public Entity getEntity(int id) {
@@ -42,20 +42,17 @@ public class EntityManager implements ComponentManager.Observer {
 	public Entity createEntity() {
 		Entity rv = pool.get();
 		entities.put(rv.id, rv);
-		for (Observer o : observers) {
-			o.onEntityCreated(rv);
-		}
+		observers.onEntityAdded(rv);
 		return rv;
 	}
 
 	public void destroyEntity(Entity e) {
 		componentManager.removeAllEntityComponents(e);
+		// Notify all observers after removing components
+		observers.onEntityRemoved(e);
 		disabled.remove(e.id);
 		entities.remove(e.id);
 		pool.release(e);
-		for (Observer o : observers) {
-			o.onEntityDestroyed(e);
-		}
 	}
 
 	public void setEntityEnabled(Entity e, boolean enabled) {
@@ -83,77 +80,35 @@ public class EntityManager implements ComponentManager.Observer {
 	}
 
 	public View getView(Aspect aspect) {
-		WeakReference<View> ref = views.get(aspect);
+		WeakReference<View> ref = viewMap.get(aspect);
 		View rv;
 		if (ref == null || ref.get() == null) {
 			rv = new View(this, aspect);
-			views.put(aspect, new WeakReference<View>(rv));
+			viewMap.put(aspect, new WeakReference<View>(rv));
 		} else {
 			rv = ref.get();
 		}
 		return rv;
 	}
 
-	@Override
-	public void onComponentAdded(Entity e, Class<? extends Component> type) {
-		Map.Entry<Aspect, WeakReference<View>> entry;
-		for (Iterator<Map.Entry<Aspect, WeakReference<View>>> iter = views.entrySet().iterator(); iter.hasNext();) {
-			entry = iter.next();
-			if (entry.getValue() != null && entry.getValue().get() != null) {
-				entry.getValue().get().check(e);
-			} else {
-				iter.remove();
-			}
-		}
-	}
 
-	@Override
-	public void onComponentUpdated(Entity e, Class<? extends Component> type) {
-
-	}
-
-	@Override
-	public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
-		Map.Entry<Aspect, WeakReference<View>> entry;
-		for (Iterator<Map.Entry<Aspect, WeakReference<View>>> iter = views.entrySet().iterator(); iter.hasNext();) {
-			entry = iter.next();
-			if (entry.getValue() != null && entry.getValue().get() != null) {
-				// since we are receiving this event before the component is physically removed,
-				// we need the view to check a bitset that has had the removed component manually removed
-				BitSet bs = (BitSet) componentManager.getEntityComponentBits(e).clone();
-				bs.clear(Component.typeIndex.forType(type));
-				entry.getValue().get().check(e.id, bs);
-			} else {
-				iter.remove();
-			}
-		}
-	}
-
-	@Override
-	public void onComponentRemoved(Entity e, Class<? extends Component> type) {
-
-	}
 
 	/**
-	 * Add an Observer that gets notification of Entity lifecycle events.
+	 * Add an EntityObserver that gets notification of Entity lifecycle AND Component events.
+	 * There is no need to register the given Observer with the ComponentManager as well.
 	 * @param o
 	 */
-	public void addObserver(Observer o) {
-		observers.add(o);
+	public void addObserver(EntityObserver o) {
+		observers.addObserver(o);
 	}
 
 	/**
-	 * REmove a previously registered Observer
+	 * Remove a previously registered EntityObserver
 	 * @param o
 	 * @return
 	 */
-	public boolean removeObserver(Observer o) {
-		return observers.remove(o);
-	}
-
-	public static interface Observer {
-		public void onEntityCreated(Entity e);
-		public void onEntityDestroyed(Entity e);
+	public boolean removeObserver(EntityObserver o) {
+		return observers.removeObserver(o);
 	}
 
 	private class EntityPool {
@@ -169,6 +124,7 @@ public class EntityManager implements ComponentManager.Observer {
 		}
 
 		public void release(Entity e) {
+			// TODO: ensure Entities are correctly reset
 			pool.add(e);
 		}
 	}

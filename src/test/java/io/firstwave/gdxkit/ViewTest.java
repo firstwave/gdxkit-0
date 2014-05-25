@@ -1,7 +1,6 @@
 package io.firstwave.gdxkit;
 
 import io.firstwave.gdxkit.mock.MockComponents;
-import io.firstwave.gdxkit.util.Signal;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -78,35 +77,4 @@ public class ViewTest implements MockComponents {
 		assertEquals(0, v.count());
 	}
 
-	private int a, r;
-	@Test
-	public void testSignals() {
-		a = 0;
-		r = 0;
-		v = em.getView(Aspect.getAspectForOne(C1_TYPE));
-		v.entityAdded.register(new Signal.Listener<Entity>() {
-			@Override
-			public void onBroadcast(Entity message) {
-				a++;
-			}
-		});
-		v.entityRemoved.register(new Signal.Listener<Entity>() {
-			@Override
-			public void onBroadcast(Entity message) {
-				r++;
-			}
-		});
-
-		Entity e;
-		for (int i = 0; i < 10; i++) {
-			e = em.createEntity();
-			em.componentManager.setEntityComponent(e, C1);
-		}
-
-		for (Entity ent: v) {
-			em.componentManager.removeAllEntityComponents(ent);
-		}
-		assertEquals(10, a);
-		assertEquals(10, r);
-	}
 }

@@ -1,7 +1,5 @@
 package io.firstwave.gdxkit;
 
-import io.firstwave.gdxkit.util.Signal;
-
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -10,30 +8,26 @@ import java.util.NoSuchElementException;
  * First version created on 3/29/14.
  */
 public class View implements Iterable<Entity> {
-	public final Signal<Entity> entityAdded;
-	public final Signal<Entity> entityRemoved;
 
 	private final BitSet bits;
 	private final EntityManager manager;
 	private final Aspect aspect;
+	private final EntityObserverAdapter observers;
 
 	View(EntityManager manager, Aspect aspect) {
-		if (manager == null) throw new NullPointerException();
-		entityAdded = new Signal<Entity>();
-		entityRemoved = new Signal<Entity>();
-
-		bits = new BitSet();
-		this.manager = manager;
-		this.aspect = aspect;
+		this(manager, aspect, new BitSet());
+		if (aspect == null) throw new NullPointerException();
 	}
 
-	private View(EntityManager manager, BitSet bits) {
+	private View(EntityManager manager, Aspect aspect, BitSet bits) {
 		if (manager == null) throw new NullPointerException();
-		entityAdded = new Signal.VoidSignal<Entity>();
-		entityRemoved = entityAdded;
+		observers = new EntityObserverAdapter();
 		this.bits = bits;
 		this.manager = manager;
-		this.aspect = null;
+		if (aspect != null) {
+			manager.addObserver(new EntityManagerObserver());
+		}
+		this.aspect = aspect;
 	}
 
 	/**
@@ -46,7 +40,7 @@ public class View implements Iterable<Entity> {
 	public static View union(View v1, View v2) {
 		BitSet bits = (BitSet) v1.bits.clone();
 		bits.or(v2.bits);
-		return new View(v1.manager, bits);
+		return new View(v1.manager, null, bits);
 	}
 
 	/**
@@ -59,7 +53,7 @@ public class View implements Iterable<Entity> {
 	public static View intersection(View v1, View v2) {
 		BitSet bits = (BitSet) v1.bits.clone();
 		bits.and(v2.bits);
-		return new View(v1.manager, bits);
+		return new View(v1.manager, null, bits);
 	}
 
 	/**
@@ -75,32 +69,25 @@ public class View implements Iterable<Entity> {
 				bits.set(i);
 			}
 		}
-		return new View(v.manager, bits);
+		return new View(v.manager, null, bits);
 	}
 
 	/**
-	 * Evaluate an entity's componentBits and determine if it's nodeId should be inserted or removed from this view.
+	 * Evaluate an entity's componentBits and determine if it's relevant to the Aspect given at construction.
+	 * Return true if the Entity is considered relevant to this View's aspect
 	 * For internal use only
 	 */
-	void check(int id, BitSet componentBits) {
-		if(aspect.check(componentBits)) {
-			if (bits.get(id)) return;
-			bits.set(id);
-			entityAdded.broadcast(manager.getEntity(id));
-		} else {
-			// see if we should remove
-			if (!bits.get(id)) return;
-			bits.clear(id);
-			entityRemoved.broadcast(manager.getEntity(id));
-		}
+	boolean check(BitSet componentBits) {
+		return aspect.check(componentBits);
 	}
 
 	/**
-	 * Evaluate an entity's componentBits and determine if it's nodeId should be inserted or removed from this view.
+	 * Evaluate an entity's componentBits and determine if it's relevant to the Aspect given at construction.
+	 * Return true if the Entity is considered relevant to this View's aspect
 	 * For internal use only
 	 */
-	void check(Entity e) {
-		check(e.id, manager.componentManager.getEntityComponentBits(e));
+	boolean check(Entity e) {
+		return check(manager.componentManager.getEntityComponentBits(e));
 	}
 
 	/**
@@ -123,6 +110,58 @@ public class View implements Iterable<Entity> {
 	@Override
 	public Iterator<Entity> iterator() {
 		return new ViewIterator(this);
+	}
+
+	/**
+	 * listen to all events coming from the EntityManager and determine their relevance to this View
+ 	 */
+	private class EntityManagerObserver implements EntityObserver {
+		@Override
+		public void onEntityAdded(Entity e) {
+			// since this event is fired before an Entity has any components, we can ignore it
+		}
+
+		@Override
+		public void onEntityRemoved(Entity e) {
+			// since this event is fired after an Entity has had all of its components removed, we can ignore it
+		}
+
+		@Override
+		public void onComponentAdded(Entity e, Class<? extends Component> type) {
+			if (check(e)) {
+				if (!bits.get(e.id)) {
+					bits.set(e.id);
+					// we send an Entity added event if the Entity is new to this View
+					observers.onEntityAdded(e);
+				}
+				observers.onComponentAdded(e, type);
+			}
+		}
+
+		@Override
+		public void onComponentUpdated(Entity e, Class<? extends Component> type) {
+			if (check(e)) observers.onComponentUpdated(e, type);
+		}
+
+		@Override
+		public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
+			if (check(e)) observers.onBeforeComponentRemoved(e, type);
+		}
+
+		@Override
+		public void onComponentRemoved(Entity e, Class<? extends Component> type) {
+			// this event is fired after the component has been removed
+			if (bits.get(e.id)) {
+				// if the Entity was in this View, we notify observers
+				observers.onComponentRemoved(e, type);
+				if (!check(e)) {
+					// if the Entity is no longer relevant, we also notify that it has been removed
+					bits.clear(e.id);
+					observers.onEntityRemoved(e);
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -170,4 +209,5 @@ public class View implements Iterable<Entity> {
 			throw new UnsupportedOperationException();
 		}
 	}
+
 }
