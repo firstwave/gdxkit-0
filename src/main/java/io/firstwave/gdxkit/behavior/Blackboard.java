@@ -1,5 +1,7 @@
 package io.firstwave.gdxkit.behavior;
 
+import io.firstwave.gdxkit.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import java.util.Map;
  * First version created on 4/13/14.
  */
 public class Blackboard implements IBlackboard {
+	private static final String TAG = Blackboard.class.getSimpleName();
 
 	private final Map<String, Object> mMap;
 
@@ -27,7 +30,7 @@ public class Blackboard implements IBlackboard {
 	}
 
 	private void typeWarning(String key, String type) {
-		System.out.println("Couldn't cast mapped value for '" + key + "' to " + type);
+		Log.d(TAG, "Couldn't cast mapped value for '" + key + "' to " + type);
 	}
 
 	@Override
