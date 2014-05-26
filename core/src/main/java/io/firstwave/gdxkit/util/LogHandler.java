@@ -10,7 +10,7 @@ public interface LogHandler {
 	 * Provides a basic implementation of a LogHandler that writes messages to std out/err
 	 */
 	public static final LogHandler STD = new LogHandler() {
-		private final String[] LEVELS = {"NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"};
+		private final String[] LEVELS = {"NONE", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"};
 		private final String DELIM = " \t";
 		@Override
 		public void handleMessage(int level, String tag, String message, Throwable t) {
