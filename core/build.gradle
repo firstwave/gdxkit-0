@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+//version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.badlogicgames.gdx:gdx:1.0.0'
+    testCompile 'junit:junit:4.11'
+}
