@@ -1,13 +1,16 @@
 package io.firstwave.gdxkit;
 
+import io.firstwave.gdxkit.test.TestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * First version created on 4/25/14.
  */
+@RunWith(TestRunner.class)
 public class ResourceContextTest {
 
 	ResourceContext rc;

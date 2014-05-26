@@ -1,7 +1,9 @@
 package io.firstwave.gdxkit;
 
 import io.firstwave.gdxkit.mock.MockComponents;
+import io.firstwave.gdxkit.test.TestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * First version created on 3/30/14.
  */
+@RunWith(TestRunner.class)
 public class AspectTest implements MockComponents {
 	@Test
 	public void testCheck() throws Exception {

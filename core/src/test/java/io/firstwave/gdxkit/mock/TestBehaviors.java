@@ -2,6 +2,7 @@ package io.firstwave.gdxkit.mock;
 
 import io.firstwave.gdxkit.behavior.IBlackboard;
 import io.firstwave.gdxkit.behavior.Node;
+import io.firstwave.gdxkit.util.Log;
 
 /**
  * First version created on 4/14/14.
@@ -23,7 +24,7 @@ public interface TestBehaviors {
 		@Override
 		public Status evaluate(Object o, IBlackboard bb) {
 			if (sb == null) {
-				System.out.println(getNodePath() + ":FAILURE");
+				Log.v(getNodePath() + ":FAILURE");
 			} else {
 				sb.append(s);
 			}
@@ -47,7 +48,7 @@ public interface TestBehaviors {
 		@Override
 		public Status evaluate(Object o, IBlackboard bb) {
 			if (sb == null) {
-				System.out.println(getNodePath() + ":SUCCESS");
+				Log.v(getNodePath() + ":SUCCESS");
 			} else {
 				sb.append(s);
 			}

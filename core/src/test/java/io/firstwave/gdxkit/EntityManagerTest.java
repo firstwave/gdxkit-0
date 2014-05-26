@@ -1,8 +1,10 @@
 package io.firstwave.gdxkit;
 
 import io.firstwave.gdxkit.mock.MockComponents;
+import io.firstwave.gdxkit.test.TestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -13,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * First version created on 3/30/14.
  */
+@RunWith(TestRunner.class)
 public class EntityManagerTest {
 
 	private EntityManager em;

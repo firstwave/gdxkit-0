@@ -144,25 +144,4 @@ public class Log {
 		out(ERROR, tag, message, null, formatArgs);
 	}
 
-	/**
-	 * Default implementation of LogHandler that redirects all output to stdout and stderr
-	 */
-	public static class StdHandler implements LogHandler {
-		private static final String[] LEVELS = {"NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"};
-		private static final String DELIM = " \t";
-		@Override
-		public void handleMessage(int level, String tag, String message, Throwable t) {
-			String line = "[" + System.currentTimeMillis() + " " + LEVELS[level] + "]" +
-					DELIM + tag + DELIM + message;
-			if (level == ERROR) {
-				System.err.println(line);
-			} else {
-				System.out.println(line);
-			}
-			if (t != null) {
-				t.printStackTrace();
-			}
-		}
-	}
-
 }

@@ -3,6 +3,7 @@ package io.firstwave.gdxkit.behavior;
 import io.firstwave.gdxkit.Entity;
 import io.firstwave.gdxkit.EntityFactory;
 import io.firstwave.gdxkit.mock.TestBehaviors;
+import io.firstwave.gdxkit.util.Log;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,7 +72,7 @@ public class SequenceTest implements TestBehaviors {
 		Node.Status status = Node.Status.SUCCESS;
 		do {
 			status = s.evaluate(e, b);
-			System.out.println(status.toString());
+			Log.v(status.toString());
 		} while (status != Node.Status.FAILURE);
 		// the last 2 represents the SUCCESSful evaluation, so there should be one more than the number of RUNNING evals
 		assertEquals("12223", sb.toString());

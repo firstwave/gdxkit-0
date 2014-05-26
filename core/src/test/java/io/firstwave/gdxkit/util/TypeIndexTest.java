@@ -1,12 +1,15 @@
 package io.firstwave.gdxkit.util;
 
+import io.firstwave.gdxkit.test.TestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static junit.framework.TestCase.assertEquals;
 
 /**
  * First version created on 3/30/14.
  */
+@RunWith(TestRunner.class)
 public class TypeIndexTest {
 
 	@Test

@@ -1,7 +1,6 @@
 package io.firstwave.gdxkit;
 
 import io.firstwave.gdxkit.mock.MockComponents;
-import io.firstwave.gdxkit.util.Log;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,8 +15,6 @@ public class ViewTest implements MockComponents {
 
 	@Before
 	public void setUp() {
-		Log.setLevel(Log.VERBOSE);
-		Log.setHandler(new Log.StdHandler());
 		em = new EntityManager();
 	}
 
