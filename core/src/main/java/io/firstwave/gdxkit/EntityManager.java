@@ -3,14 +3,18 @@ package io.firstwave.gdxkit;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
+import io.firstwave.gdxkit.util.Log;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * First version created on 3/29/14.
  */
 public class EntityManager {
+
+	private static final String TAG = EntityManager.class.getSimpleName();
 
 	private final IntMap<Entity> entities;
 	private final IntSet disabled;
@@ -42,6 +46,7 @@ public class EntityManager {
 	public Entity createEntity() {
 		Entity rv = pool.get();
 		entities.put(rv.id, rv);
+		Log.v(TAG, "onEntityAdded:" + rv);
 		observers.onEntityAdded(rv);
 		return rv;
 	}
@@ -49,6 +54,7 @@ public class EntityManager {
 	public void destroyEntity(Entity e) {
 		componentManager.removeAllEntityComponents(e);
 		// Notify all observers after removing components
+		Log.v(TAG, "onEntityRemoved:" + e);
 		observers.onEntityRemoved(e);
 		disabled.remove(e.id);
 		entities.remove(e.id);
@@ -56,6 +62,7 @@ public class EntityManager {
 	}
 
 	public void setEntityEnabled(Entity e, boolean enabled) {
+		Log.v(TAG, "setEntityEnabled:" + e + " [" + enabled + "]");
 		if (enabled) {
 			disabled.remove(e.id);
 		} else {
@@ -119,12 +126,19 @@ public class EntityManager {
 		}
 
 		public Entity get() {
-			if (pool.size == 0) return new Entity(EntityManager.this, nextId++);
-			return pool.pop();
+			Entity rv;
+			if (pool.size == 0) {
+				rv = new Entity(EntityManager.this, nextId++);
+			} else {
+				rv = pool.pop();
+			}
+			Log.v("EntityPool", "get: " + rv + " size = " + pool.size);
+			return rv;
 		}
 
 		public void release(Entity e) {
 			// TODO: ensure Entities are correctly reset
+			Log.v("EntityPool", "release: " + e + " size = " + pool.size);
 			pool.add(e);
 		}
 	}

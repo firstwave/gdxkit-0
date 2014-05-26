@@ -2,6 +2,7 @@ package io.firstwave.gdxkit;
 
 import com.badlogic.gdx.utils.IntMap;
 import io.firstwave.gdxkit.util.ImmutableBitSet;
+import io.firstwave.gdxkit.util.Log;
 
 import java.util.BitSet;
 import java.util.HashMap;
@@ -12,6 +13,8 @@ import java.util.Map;
  * First version created on 3/30/14.
  */
 public class ComponentManager {
+
+	private static final String TAG = ComponentManager.class.getSimpleName();
 	/**
 	 * The outer map uses Component indices and the inner map uses Entity indices.
 	 * This results in each inner map containing the same type of component for each entity
@@ -69,8 +72,10 @@ public class ComponentManager {
 		boolean added = !bits.get(i);
 		bits.set(i);
 		if (added) {
+			Log.v(TAG, "onComponentAdded:" + e + " [" + c + "]");
 			observers.onComponentAdded(e, c.getClass());
 		} else {
+			Log.v(TAG, "onComponentUpdated:" + e + " [" + c + "]");
 			observers.onComponentUpdated(e, c.getClass());
 		}
 
@@ -103,10 +108,12 @@ public class ComponentManager {
 		if (map == null) return false;
 		if (bits.get(i)) {
 			// we need to notify the observer *before* actually removing the component from the table
+			Log.v(TAG, "onBeforeComponentRemoved:" + e + " [" + type + "]");
 			observers.onBeforeComponentRemoved(e, type);
 			removed.put(e.id, map.get(e.id));
 			map.put(e.id, null);
 			bits.clear(i);
+			Log.v(TAG, "onComponentRemoved:" + e + " [" + type + "]");
 			observers.onComponentRemoved(e, type);
 			return true;
 		}
