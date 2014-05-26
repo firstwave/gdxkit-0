@@ -10,7 +10,7 @@ import org.junit.runners.model.InitializationError;
  */
 public class TestRunner extends BlockJUnit4ClassRunner {
 	static {
-		Log.setHandler(LogHandler.STD);
+		Log.setHandler(LogHandler.DEFAULT);
 		Log.setLevel(Log.VERBOSE);
 	}
 
