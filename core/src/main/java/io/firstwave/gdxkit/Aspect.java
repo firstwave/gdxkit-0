@@ -151,6 +151,17 @@ public class Aspect {
 		return aspect;
 	}
 
+	/**
+	 * Check if a given Component type is of potential interest to this Aspect.
+	 * A Component is considered potentially relevant if the type has been specified in either the 'all' or 'one' sets, but not the 'exclude' set.
+	 *
+	 * @param type
+	 * @return
+	 */
+	public boolean check(Class<? extends Component> type) {
+		int i = Component.typeIndex.forType(type);
+		return (allSet.get(i) || oneSet.get(i) && !exclusionSet.get(i));
+	}
 
 	/**
 	 * Will check if the entity is of interest to this Aspect.

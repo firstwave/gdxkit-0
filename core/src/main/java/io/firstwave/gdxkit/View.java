@@ -77,17 +77,12 @@ public class View implements Iterable<Entity> {
 	 * Return true if the Entity is considered relevant to this View's aspect
 	 * For internal use only
 	 */
-	boolean check(BitSet componentBits) {
-		return aspect.check(componentBits);
+	boolean check(Entity e) {
+		return aspect.check(manager.componentManager.getEntityComponentBits(e));
 	}
 
-	/**
-	 * Evaluate an entity's componentBits and determine if it's relevant to the Aspect given at construction.
-	 * Return true if the Entity is considered relevant to this View's aspect
-	 * For internal use only
-	 */
-	boolean check(Entity e) {
-		return check(manager.componentManager.getEntityComponentBits(e));
+	boolean check(Class<? extends Component> type) {
+		return aspect.check(type);
 	}
 
 	/**
@@ -113,6 +108,26 @@ public class View implements Iterable<Entity> {
 	}
 
 	/**
+	 * Register an EntityObserver that will respond to entity events
+	 * Observers will only receive events for entities which are relevant to this View's Aspect.
+	 * onEntityAdded() will be called when an Entity is first considered relevant, and conversely
+	 * onEntityRemoved() will be called when an Entity is no longer considered relevant.
+	 * @param o
+	 */
+	public void addObserver(EntityObserver o) {
+		observers.addObserver(o);
+	}
+
+	/**
+	 * Unregister an EntityObserver
+	 * @param o
+	 * @return
+	 */
+	public boolean removeObserver(EntityObserver o) {
+		return observers.removeObserver(o);
+	}
+
+	/**
 	 * listen to all events coming from the EntityManager and determine their relevance to this View
  	 */
 	private class EntityManagerObserver implements EntityObserver {
@@ -134,18 +149,18 @@ public class View implements Iterable<Entity> {
 					// we send an Entity added event if the Entity is new to this View
 					observers.onEntityAdded(e);
 				}
-				observers.onComponentAdded(e, type);
 			}
+			if (check(type)) observers.onComponentAdded(e, type);
 		}
 
 		@Override
 		public void onComponentUpdated(Entity e, Class<? extends Component> type) {
-			if (check(e)) observers.onComponentUpdated(e, type);
+			if (check(type)) observers.onComponentUpdated(e, type);
 		}
 
 		@Override
 		public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
-			if (check(e)) observers.onBeforeComponentRemoved(e, type);
+			if (check(type)) observers.onBeforeComponentRemoved(e, type);
 		}
 
 		@Override
@@ -153,7 +168,9 @@ public class View implements Iterable<Entity> {
 			// this event is fired after the component has been removed
 			if (bits.get(e.id)) {
 				// if the Entity was in this View, we notify observers
-				observers.onComponentRemoved(e, type);
+				if (check(type)) {
+					observers.onComponentRemoved(e, type);
+				}
 				if (!check(e)) {
 					// if the Entity is no longer relevant, we also notify that it has been removed
 					bits.clear(e.id);

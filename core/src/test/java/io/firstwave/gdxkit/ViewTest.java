@@ -1,6 +1,7 @@
 package io.firstwave.gdxkit;
 
 import io.firstwave.gdxkit.mock.MockComponents;
+import io.firstwave.gdxkit.util.Log;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,6 +16,8 @@ public class ViewTest implements MockComponents {
 
 	@Before
 	public void setUp() {
+		Log.setLevel(Log.VERBOSE);
+		Log.setHandler(new Log.StdHandler());
 		em = new EntityManager();
 	}
 
@@ -75,6 +78,71 @@ public class ViewTest implements MockComponents {
 			em.componentManager.removeAllEntityComponents(ent);
 		}
 		assertEquals(0, v.count());
+	}
+
+	@Test
+	public void testEvents() {
+		final StringBuilder sb = new StringBuilder();
+		StringBuilder test = new StringBuilder();
+
+		EntityObserver eo = new EntityObserver() {
+			@Override
+			public void onEntityAdded(Entity e) {
+				sb.append("A");
+			}
+
+			@Override
+			public void onEntityRemoved(Entity e) {
+				sb.append("R");
+			}
+
+			@Override
+			public void onComponentAdded(Entity e, Class<? extends Component> type) {
+				sb.append("a");
+			}
+
+			@Override
+			public void onComponentUpdated(Entity e, Class<? extends Component> type) {
+				sb.append("u");
+			}
+
+			@Override
+			public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
+				sb.append("b");
+			}
+
+			@Override
+			public void onComponentRemoved(Entity e, Class<? extends Component> type) {
+				sb.append("r");
+			}
+		};
+
+		v = em.getView(Aspect.getAspectForOne(C1_TYPE));
+		v.addObserver(eo);
+
+		Entity e = em.createEntity();
+
+		em.componentManager.setEntityComponent(e, new MockComponent2());
+		assertEquals(test.toString(), sb.toString());
+
+		em.componentManager.setEntityComponent(e, new MockComponent1());
+		test.append("Aa");
+		assertEquals(test.toString(), sb.toString());
+
+		em.componentManager.setEntityComponent(e, new MockComponent2());
+		assertEquals(test.toString(), sb.toString());
+
+		em.componentManager.setEntityComponent(e, new MockComponent1());
+		test.append("u");
+		assertEquals(test.toString(), sb.toString());
+
+		em.componentManager.removeEntityComponent(e, C2_TYPE);
+		assertEquals(test.toString(), sb.toString());
+
+		em.componentManager.removeEntityComponent(e, C1_TYPE);
+		test.append("brR");
+		assertEquals(test.toString(), sb.toString());
+
 	}
 
 }
