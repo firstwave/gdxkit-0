@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * First version created on 3/30/14.
  */
-public class SystemController {
+public class SystemController extends ResourceContext {
 	private final List<BaseSystem> systems;
 	private final List<BaseSystem> autoUpdateSystems;
 	private final Map<Class<? extends BaseSystem>, BaseSystem> systemsByType;
