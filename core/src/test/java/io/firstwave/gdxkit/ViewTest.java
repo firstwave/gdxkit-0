@@ -28,6 +28,17 @@ public class ViewTest implements MockComponents {
 		assertEquals(0, j);
 	}
 
+    @Test
+    public void testPrepopulate() {
+        for (int i = 0; i < 10; i++) {
+            em.createEntity().setComponent(C1);
+            em.createEntity().setComponent(C2);
+        }
+
+        v = em.getView(Aspect.getAspectForOne(C1_TYPE));
+        assertEquals(10, v.count());
+    }
+
 
 	@Test
 	public void testInsert() {

@@ -7,6 +7,7 @@ import io.firstwave.gdxkit.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -42,6 +43,10 @@ public class EntityManager {
 	public Entity getEntity(int id) {
 		return entities.get(id, null);
 	}
+
+    public Iterator<Entity> getEntities() {
+        return entities.values();
+    }
 
 	public Entity createEntity() {
 		Entity rv = pool.get();

@@ -28,6 +28,16 @@ public class View implements Iterable<Entity> {
 			manager.addObserver(new EntityManagerObserver());
 		}
 		this.aspect = aspect;
+
+        // make sure that we have an accurate view to begin with
+        Iterator<Entity> iter = manager.getEntities();
+        Entity e;
+        while (iter.hasNext()) {
+            e = iter.next();
+            if (check(e)) {
+                bits.set(e.id);
+            }
+        }
 	}
 
 	/**
