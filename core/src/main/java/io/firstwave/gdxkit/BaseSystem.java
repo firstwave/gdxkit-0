@@ -3,8 +3,7 @@ package io.firstwave.gdxkit;
 /**
  * First version created on 3/30/14.
  */
-public abstract class BaseSystem implements Comparable<BaseSystem> {
-	protected int priority;
+public abstract class BaseSystem {
 	private SystemController systemController;
 
 	public BaseSystem() {
@@ -53,8 +52,4 @@ public abstract class BaseSystem implements Comparable<BaseSystem> {
 		// no default behavior
 	}
 
-	@Override
-	public final int compareTo(BaseSystem o) {
-		return Integer.compare(priority, o.priority);
-	}
 }
