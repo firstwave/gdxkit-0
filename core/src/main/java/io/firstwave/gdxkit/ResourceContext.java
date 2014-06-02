@@ -14,6 +14,10 @@ public class ResourceContext {
 		resources = new HashMap<Class<?>, Object>();
 	}
 
+	public ResourceContext(ResourceContext context) {
+		this.resources = context.resources;
+	}
+
 	public void putResource(Object resource) {
 		if (resource == null) {
 			throw new NullPointerException();
