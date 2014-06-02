@@ -7,22 +7,30 @@ import java.util.*;
  */
 public class SystemController {
 	private final List<BaseSystem> systems;
+	private final List<BaseSystem> autoUpdateSystems;
 	private final Map<Class<? extends BaseSystem>, BaseSystem> systemsByType;
 	private float lastDelta;
 
 	public SystemController() {
 		systems = new ArrayList<BaseSystem>();
+		autoUpdateSystems = new ArrayList<BaseSystem>();
 		systemsByType = new HashMap<Class<? extends BaseSystem>, BaseSystem>();
 		lastDelta = 0.0f;
 	}
 
 	public void registerSystem(BaseSystem system) {
+		registerSystem(system, true);
+	}
+
+	public void registerSystem(BaseSystem system, boolean autoUpdate) {
 		if (systemsByType.containsKey(system.getClass())) {
 			throw new IllegalStateException("Cannot register two systems of the same type!");
 		}
 		systemsByType.put(system.getClass(), system);
 		systems.add(system);
-		Collections.sort(systems);
+		if (autoUpdate) {
+			autoUpdateSystems.add(system);
+		}
 		system.register(this);
 	}
 
@@ -32,6 +40,7 @@ public class SystemController {
 			systemsByType.remove(type);
 			system.unregister();
 			systems.remove(system);
+			autoUpdateSystems.remove(system);
 		} else {
 			throw new NoSuchElementException("No system registered for type:" + type.getSimpleName());
 		}
@@ -51,7 +60,7 @@ public class SystemController {
 
 	public void updateSystems(float delta) {
 		lastDelta = delta;
-		for (BaseSystem s : systems) {
+		for (BaseSystem s : autoUpdateSystems) {
 			s.update(delta);
 		}
 	}
