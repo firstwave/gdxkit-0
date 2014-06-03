@@ -65,6 +65,7 @@ public class ComponentManager {
 			bits = new BitSet();
 			componentBits.put(e.id, bits);
 		}
+		// TODO: instead of updated, we should be firing beforeRemove/remove/added events instead.
 		map.put(e.id, c);
 		// check if the component was already set
 		// to ensure we don't notify observers when
