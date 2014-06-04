@@ -21,11 +21,6 @@ public class DefaultEntityObserver implements EntityObserver {
 	}
 
 	@Override
-	public void onComponentUpdated(Entity e, Class<? extends Component> type) {
-
-	}
-
-	@Override
 	public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 
 	}

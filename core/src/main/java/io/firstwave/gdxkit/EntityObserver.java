@@ -30,16 +30,6 @@ public interface EntityObserver {
 	public void onComponentAdded(Entity e, Class<? extends Component> type);
 
 	/**
-	 * This method is called when a component is replaced by a new component of the same type.
-	 * Note, this will not be called if onComponentAdded has already been called for the change
-	 * This is useful to provide a generic mechanism to monitor changes to immutable Component types
-	 * @param e
-	 * @param type
-	 */
-	public void onComponentUpdated(Entity e, Class<? extends Component> type);
-
-
-	/**
 	 * This method is called BEFORE the component is removed from the internal table.
 	 * This allows a observers to perform cleanup that may be dependent on component data
 	 * @param e

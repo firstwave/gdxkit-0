@@ -164,11 +164,6 @@ public class View implements Iterable<Entity> {
 		}
 
 		@Override
-		public void onComponentUpdated(Entity e, Class<? extends Component> type) {
-			if (check(type)) observers.onComponentUpdated(e, type);
-		}
-
-		@Override
 		public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 			if (check(type)) observers.onBeforeComponentRemoved(e, type);
 		}

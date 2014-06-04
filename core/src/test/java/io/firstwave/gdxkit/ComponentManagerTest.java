@@ -83,14 +83,6 @@ public class ComponentManagerTest implements MockComponents{
 			}
 
 			@Override
-			public void onComponentUpdated(Entity e, Class<? extends Component> type) {
-				sb.append("u");
-				sb.append(e.id);
-				sb.append(Component.typeIndex.forType(type));
-				assertTrue(cm.entityHasComponent(e, type));
-			}
-
-			@Override
 			public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 				sb.append("r");
 				sb.append(e.id);
@@ -115,7 +107,13 @@ public class ComponentManagerTest implements MockComponents{
 
 		
 		cm.setEntityComponent(e, C1);
-		rec.append("u");
+		rec.append("r");
+		rec.append(e.id);
+		rec.append(C1_INDEX);
+
+		rec.append("R");
+
+		rec.append("a");
 		rec.append(e.id);
 		rec.append(C1_INDEX);
 

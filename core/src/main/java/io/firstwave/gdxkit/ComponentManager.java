@@ -57,6 +57,7 @@ public class ComponentManager {
 		int i = Component.typeIndex.forType(c.getClass());
 		IntMap<Component> map = componentTable.get(i, null);
 		BitSet bits = componentBits.get(e.id, null);
+
 		if (map == null) {
 			map = emptyMap();
 			componentTable.put(i, map);
@@ -65,21 +66,18 @@ public class ComponentManager {
 			bits = new BitSet();
 			componentBits.put(e.id, bits);
 		}
-		// TODO: instead of updated, we should be firing beforeRemove/remove/added events instead.
-		map.put(e.id, c);
-		// check if the component was already set
-		// to ensure we don't notify observers when
-		// a component is merely replaced
-		boolean added = !bits.get(i);
-		bits.set(i);
-		if (added) {
-			Log.v(TAG, "onComponentAdded:" + e + " [" + c + "]");
-			observers.onComponentAdded(e, c.getClass());
-		} else {
-			Log.v(TAG, "onComponentUpdated:" + e + " [" + c + "]");
-			observers.onComponentUpdated(e, c.getClass());
+
+		if (bits.get(i)) {
+			//...a Component of this type is already present
+			removeEntityComponent(e, c.getClass());
 		}
 
+		// now that we've removed the existing component, add the new one
+		map.put(e.id, c);
+		bits.set(i);
+
+		Log.v(TAG, "onComponentAdded:" + e + " [" + c + "]");
+		observers.onComponentAdded(e, c.getClass());
 	}
 
 	/**

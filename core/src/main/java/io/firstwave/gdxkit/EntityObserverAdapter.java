@@ -41,13 +41,6 @@ public class EntityObserverAdapter implements EntityObserver {
 	}
 
 	@Override
-	public void onComponentUpdated(Entity e, Class<? extends Component> type) {
-		for (EntityObserver o : observers.keySet()) {
-			o.onComponentUpdated(e, type);
-		}
-	}
-
-	@Override
 	public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 		for (EntityObserver o : observers.keySet()) {
 			o.onBeforeComponentRemoved(e, type);

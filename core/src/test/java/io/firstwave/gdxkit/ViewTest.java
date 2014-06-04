@@ -110,11 +110,6 @@ public class ViewTest implements MockComponents {
 			}
 
 			@Override
-			public void onComponentUpdated(Entity e, Class<? extends Component> type) {
-				sb.append("u");
-			}
-
-			@Override
 			public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
 				sb.append("b");
 			}
@@ -141,7 +136,7 @@ public class ViewTest implements MockComponents {
 		assertEquals(test.toString(), sb.toString());
 
 		em.componentManager.setEntityComponent(e, new MockComponent1());
-		test.append("u");
+		test.append("brRAa");
 		assertEquals(test.toString(), sb.toString());
 
 		em.componentManager.removeEntityComponent(e, C2_TYPE);
