@@ -32,13 +32,13 @@ public class ComponentManager {
 	private final IntMap<BitSet> componentBits;
 
 	private final Map<Class<? extends Component>, ComponentMap> componentMaps;
-	private EntityObserverAdapter observers;
+	private WeakEntityObserverAdapter observers;
 	public ComponentManager() {
 		componentTable = new IntMap<IntMap<Component>>();
 		componentBits = new IntMap<BitSet>();
 		componentMaps = new HashMap<Class<? extends Component>, ComponentMap>();
 		removed = new IntMap<Component>();
-		observers = new EntityObserverAdapter();
+		observers = new WeakEntityObserverAdapter();
 	}
 
 	private IntMap<Component> emptyMap() {

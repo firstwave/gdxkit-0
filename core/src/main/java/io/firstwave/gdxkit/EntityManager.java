@@ -22,6 +22,7 @@ public class EntityManager {
 	private final EntityPool pool;
 	private final Map<Aspect, WeakReference<View>> viewMap;
 	private final EntityObserverAdapter observers;
+	private final WeakEntityObserverAdapter weakObservers;
 
 	public final ComponentManager componentManager;
 
@@ -37,6 +38,8 @@ public class EntityManager {
 
 		this.componentManager = componentManager;
 		observers = new EntityObserverAdapter();
+		weakObservers = new WeakEntityObserverAdapter();
+		observers.addObserver(weakObservers);
 		componentManager.addObserver(observers);
 	}
 
@@ -103,7 +106,13 @@ public class EntityManager {
 		return rv;
 	}
 
-
+	/**
+	 * Add an entity observer that gets retained by a weak reference. This is intended to be used with Views, as we don't want to leak a whole bunch of them by automatically adding them to the observer pool and never removing them.
+	 * @param o
+	 */
+	void addWeakObserver(EntityObserver o) {
+		weakObservers.addObserver(o);
+	}
 
 	/**
 	 * Add an EntityObserver that gets notification of Entity lifecycle AND Component events.

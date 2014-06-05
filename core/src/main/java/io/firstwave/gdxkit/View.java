@@ -12,7 +12,7 @@ public class View implements Iterable<Entity> {
 	private final BitSet bits;
 	private final EntityManager manager;
 	private final Aspect aspect;
-	private final EntityObserverAdapter observers;
+	private final WeakEntityObserverAdapter observers;
 
 	View(EntityManager manager, Aspect aspect) {
 		this(manager, aspect, new BitSet());
@@ -21,11 +21,11 @@ public class View implements Iterable<Entity> {
 
 	private View(EntityManager manager, Aspect aspect, BitSet bits) {
 		if (manager == null) throw new NullPointerException();
-		observers = new EntityObserverAdapter();
+		observers = new WeakEntityObserverAdapter();
 		this.bits = bits;
 		this.manager = manager;
 		if (aspect != null) {
-			manager.addObserver(new EntityManagerObserver());
+			manager.addWeakObserver(new EntityManagerObserver());
 		}
 		this.aspect = aspect;
 
