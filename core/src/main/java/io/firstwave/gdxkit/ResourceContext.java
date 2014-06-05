@@ -22,15 +22,20 @@ public class ResourceContext {
 		if (resource == null) {
 			throw new NullPointerException();
 		}
-		if (resources.containsKey(resource.getClass())) {
-			throw new IllegalArgumentException("ResourceContext can't manage two resources of the same type!");
-		}
 		resources.put(resource.getClass(), resource);
 	}
 
 	public <T> T getResource(Class<T> type) {
 		Object rv = resources.get(type);
 		if (rv == null) return null;
+		return type.cast(rv);
+	}
+
+	public <T> T removeResource(Class<T> type) {
+		Object rv = resources.remove(type);
+		if (rv == null) {
+			return null;
+		}
 		return type.cast(rv);
 	}
 }
