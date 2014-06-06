@@ -21,7 +21,6 @@ public abstract class AspectSystem extends BaseSystem implements EntityObserver 
 	protected void onInitialized() {
 		aspectView = getController().getResource(EntityManager.class).getView(aspect);
 		aspectView.addObserver(this);
-		aspectView.addObserver(new LoggingEntityObserver(TAG));
 
 		for (Entity e : aspectView) {
 			onEntityAdded(e);
