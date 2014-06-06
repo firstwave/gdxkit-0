@@ -12,7 +12,8 @@ public class View implements Iterable<Entity> {
 	private final BitSet bits;
 	private final EntityManager manager;
 	private final Aspect aspect;
-	private final WeakEntityObserverAdapter observers;
+	private final EntityObserverAdapter observers;
+	private final EntityManagerObserver entityManagerObserver;
 
 	View(EntityManager manager, Aspect aspect) {
 		this(manager, aspect, new BitSet());
@@ -21,11 +22,15 @@ public class View implements Iterable<Entity> {
 
 	private View(EntityManager manager, Aspect aspect, BitSet bits) {
 		if (manager == null) throw new NullPointerException();
-		observers = new WeakEntityObserverAdapter();
+		observers = new EntityObserverAdapter();
+		entityManagerObserver = new EntityManagerObserver();
 		this.bits = bits;
 		this.manager = manager;
 		if (aspect != null) {
-			manager.addWeakObserver(new EntityManagerObserver());
+			// we register as a weak observer so we don't end up leaking a View every time they go out of scope.
+			// This way, clients can request an Aspect view, operate on it and forget about it and the manager
+			// won't hold on to a strong reference to our observer
+			manager.addWeakObserver(entityManagerObserver);
 		}
 		this.aspect = aspect;
 

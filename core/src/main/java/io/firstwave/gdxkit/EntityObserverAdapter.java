@@ -54,4 +54,8 @@ public class EntityObserverAdapter implements EntityObserver {
 			o.onComponentRemoved(e, type);
 		}
 	}
+
+	public int getCount() {
+		return observers.size();
+	}
 }

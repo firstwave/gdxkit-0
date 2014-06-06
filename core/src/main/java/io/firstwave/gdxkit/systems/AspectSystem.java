@@ -1,68 +1,77 @@
 package io.firstwave.gdxkit.systems;
 
 import io.firstwave.gdxkit.*;
+import io.firstwave.gdxkit.util.Log;
 import io.firstwave.gdxkit.util.Signal;
 
 /**
  * First version created on 3/30/14.
  */
-public abstract class AspectSystem extends EntitySystem {
+public abstract class AspectSystem extends BaseSystem implements EntityObserver {
+	private static final String TAG = AspectSystem.class.getSimpleName();
 	private View aspectView;
 	private final Aspect aspect;
-	private final Signal.Listener<Entity> entityAddedListener;
-	private final Signal.Listener<Entity> entityRemovedListener;
+	private boolean initialized = false;
 
-	public AspectSystem(EntityManager manager, Aspect aspect) {
-		super(manager);
+	public AspectSystem(Aspect aspect) {
 		this.aspect = aspect;
-		entityAddedListener = new Signal.Listener<Entity>() {
-			@Override
-			public void onBroadcast(Entity message) {
-				onEntityAdded(message);
-			}
-		};
-		entityRemovedListener = new Signal.Listener<Entity>() {
-			@Override
-			public void onBroadcast(Entity message) {
-				onEntityRemoved(message);
-			}
-		};
 	}
 
 	@Override
-	protected void onRegistered() {
-		aspectView = entityManager.getView(aspect);
+	protected void onInitialized() {
+		aspectView = getController().getResource(EntityManager.class).getView(aspect);
+		aspectView.addObserver(this);
+		aspectView.addObserver(new LoggingEntityObserver(TAG));
+
 		for (Entity e : aspectView) {
 			onEntityAdded(e);
 		}
-//		aspectView.entityAdded.register(entityAddedListener);
-//		aspectView.entityRemoved.register(entityRemovedListener);
+		initialized = true;
 	}
 
 	@Override
 	protected void onUnregistered() {
-//		aspectView.entityAdded.unregister(entityAddedListener);
-//		aspectView.entityRemoved.unregister(entityRemovedListener);
 		for (Entity e : aspectView) {
 			onEntityRemoved(e);
 		}
 		aspectView = null;
+		initialized = false;
 	}
 
 	@Override
 	public void onUpdate(float delta) {
+		if (!initialized) {
+			throw new IllegalStateException("You must call super.initialize() before updating this system!");
+		}
 		for (Entity e : aspectView) {
 			processEntity(e, delta);
 		}
 	}
 
+	public abstract void processEntity(Entity e, float delta);
+
+	@Override
 	public void onEntityAdded(Entity e) {
 
 	}
 
+	@Override
 	public void onEntityRemoved(Entity e) {
 
 	}
 
-	public abstract void processEntity(Entity e, float delta);
+	@Override
+	public void onComponentAdded(Entity e, Class<? extends Component> type) {
+
+	}
+
+	@Override
+	public void onBeforeComponentRemoved(Entity e, Class<? extends Component> type) {
+
+	}
+
+	@Override
+	public void onComponentRemoved(Entity e, Class<? extends Component> type) {
+
+	}
 }

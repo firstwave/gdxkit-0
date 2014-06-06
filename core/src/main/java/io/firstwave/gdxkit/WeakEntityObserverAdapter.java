@@ -53,4 +53,8 @@ public class WeakEntityObserverAdapter implements EntityObserver {
 			o.onComponentRemoved(e, type);
 		}
 	}
+
+	public int getCount() {
+		return observers.size();
+	}
 }
